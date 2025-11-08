@@ -1,1 +1,68 @@
-<p>user-login works!</p>
+<section class="user-login-wrapper">
+  <div class="login-card">
+    <div class="center-header">
+      <h2>Login do Utilizador</h2>
+    </div>
+
+    @if (!isCodeVisible) {
+      <form [formGroup]="emailForm" (ngSubmit)="sendEmail()">
+        <mat-form-field appearance="outline">
+          <mat-label>E-mail</mat-label>
+          <input matInput formControlName="email" type="email"/>
+
+          @if (emailForm.get("email")?.hasError("required")) {
+            <mat-error>O e-mail é obrigatório.</mat-error>
+          }
+
+          @if (emailForm.get("email")?.hasError("email")) {
+            <mat-error>E-mail inválido.</mat-error>
+          }
+        </mat-form-field>
+
+        <div class="button-group">
+          <button
+            mat-raised-button
+            color="primary"
+            type="submit"
+            [disabled]="emailForm.invalid">
+            Enviar código
+          </button>
+        </div>
+      </form>
+    } @else {
+      <form [formGroup]="codeForm" (ngSubmit)="verifyCode()">
+        <mat-form-field appearance="outline">
+          <mat-label>Código de 8 dígitos</mat-label>
+          <input matInput formControlName="code" maxlength="8" />
+
+          @if (codeForm.get("code")?.hasError("required")) {
+            <mat-error>O código é obrigatório.</mat-error>
+          }
+
+          @if (codeForm.get("code")?.hasError("pattern")) {
+            <mat-error>O código deve conter 8 dígitos.</mat-error>
+          }
+        </mat-form-field>
+
+        <div class="button-group">
+          <button
+            mat-raised-button
+            color="primary"
+            type="submit"
+            [disabled]="codeForm.invalid">
+            Entrar
+          </button>
+        </div>
+      </form>
+    }
+
+    <div class="feedback">
+      @if (message) {
+        <p class="message success">{{ message }}</p>
+      }
+      @if (errorMessage) {
+        <p class="message error">{{ errorMessage }}</p>
+      }
+    </div>
+  </div>
+</section>
