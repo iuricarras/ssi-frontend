@@ -1,0 +1,67 @@
+<div class="registration-container">
+    <h1>Registo de Entidade Credenciadora</h1>
+
+    <form #ecForm="ngForm" (ngSubmit)="onSubmit(ecForm)">
+        
+        <section>
+            <h2>Dados da Entidade</h2>
+            <label for="name">Nome Oficial:</label>
+            <input type="text" id="name" name="name" [(ngModel)]="ecData.name" required>
+
+            <div id ="tipos">
+                <label for="tipo">Tipo de Entidade:</label>
+                <select id="tipo" name="tipo" [(ngModel)]="ecData.tipo" required>
+                    <option value="" disabled selected>-- Selecione o Tipo de Entidade--</option>
+                    <option value="IES">Instituição de Ensino Superior</option>
+                    <option value="OS">Organização de Saúde</option>
+                    <option value="CP">Certificador Profissional</option>
+                    <option value="outro">Outro</option>
+                </select>
+
+                <div *ngIf="ecData.tipo === 'outro'" class="mt-3">
+                    <label for="tipoOutro">Especificar Tipo:</label>
+                    <input type="text" id="tipoOutro" name="tipoOutro" [(ngModel)]="ecData.tipoOutro" required>
+                </div>
+            </div>
+            
+
+            <label for="nif">NIF:</label>
+            <input type="text" id="nif" name="nif" [(ngModel)]="ecData.nif" required
+                mask="000000000" maxlength="9" >
+            <div>
+                <h3>Contactos</h3>
+                <label for="email">E-mail:</label>
+                <input type="email" id="email" name="email" [(ngModel)]="ecData.email" #email="ngModel" required email
+                       placeholder="contacto@instituicao.pt" >
+
+                <label for="tel">Telefone:</label>
+                <input type="text" id="tel" name="tel" [(ngModel)]="ecData.tel" #tel="ngModel" required 
+                    placeholder="+351 | " mask="000 000 000"   maxlength="18"  prefix="+351 | "      >
+            </div>
+
+        </section>
+
+        <section>
+            <h2>Chaves Públicas de Assinatura e Autenticação</h2>
+
+            <label for="certificate">Carregar Chave Pública de Assinatura (Ficheiro .pem):</label>
+            <input type="file" (change)="handleFileUpload($event, 'certificate')" accept=".pem" required/>
+            <div *ngIf="ecData.certificate">
+                <p style="color: green; font-weight: bold;">Chave Pública de Assinatura carregada com sucesso!</p>
+                <!-- <p>Conteúdo do Certificado:</p>
+                <textarea rows="15" cols="20" readonly>{{ ecData.certificate }}</textarea> -->
+            </div>
+            <label for="authKey">Carregar Chave Pública de Autenticação (Ficheiro .pem):</label>
+            <input type="file" (change)="handleFileUpload($event, 'authenticationKey')" accept=".pem" required/>
+            <div *ngIf="ecData.authenticationKey">
+                <p style="color: green; font-weight: bold;">Chave Pública de Autenticação carregada com sucesso!</p>
+                <!-- <p>Conteúdo do Certificado:</p>
+                <textarea rows="15" cols="20" readonly>{{ ecData.authenticationKey }}</textarea> -->
+            </div>
+        </section>
+
+        <button type="submit" [disabled]="!ecForm.valid"> Registar Entidade </button>
+    </form>
+</div>
+
+<!--  -->
