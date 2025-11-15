@@ -1,9 +1,16 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule, NgForm } from '@angular/forms'; // para o formulario
+import { FormsModule, NgForm } from '@angular/forms'; 
 import { NgxMaskDirective } from 'ngx-mask';
+import { MatFormFieldModule } from "@angular/material/form-field";
+import { MatInputModule } from "@angular/material/input";
+import { MatButtonModule } from "@angular/material/button";
+import { MatSelectModule } from "@angular/material/select";
+import { Router } from "@angular/router";
+import { AuthService } from "../../services/auth.service";
+import { HttpResponse } from "@angular/common/http";
 
-interface ECRegistrationData {
+export interface ECRegistrationData {
   name: string;
   tipo: string;
   tipoOutro: string;
@@ -17,7 +24,15 @@ interface ECRegistrationData {
 @Component({
   selector: 'app-ec-register',
   standalone: true,
-  imports: [FormsModule, NgxMaskDirective, CommonModule],
+  imports: [
+    FormsModule, 
+    NgxMaskDirective, 
+    CommonModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule,
+    MatSelectModule
+  ],
   templateUrl: './ec-register.html',
   styleUrl: './ec-register.css'
 })
@@ -36,7 +51,10 @@ export class ECRegister implements OnInit {
 
   areFilesUploaded: { auth: boolean, cert: boolean } = { auth: false, cert: false };
 
-  constructor() {}
+  constructor(
+    private authService: AuthService,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {}
 
@@ -45,22 +63,30 @@ export class ECRegister implements OnInit {
 
     if (input.files && input.files.length > 0) {
       const file = input.files[0];
+      const fileName = file.name;
       const reader = new FileReader();
 
-      reader.onload = () => {
-        let fileContent = reader.result as string;
-        fileContent = fileContent.replace(/[\r\n]+/g, '');
-
+      if (!fileName.toLowerCase().endsWith('.pem')) {
+        alert('Erro: O ficheiro deve ter a extensão .pem.');
         if (keyName === 'certificate') {
-          this.ecData.certificate = fileContent;
-          console.log('Conteúdo do Certificado de Assinaturas carregado (sem quebras de linha):', fileContent);
+          this.ecData.certificate = ''
         } else if (keyName === 'authenticationKey') {
-          this.ecData.authenticationKey = fileContent;
-          console.log('Conteúdo do Certificado de Autenticação carregado (sem quebras de linha):', fileContent);
+          this.ecData.authenticationKey = ''
         }
-      };
+      } else {
+        reader.onload = () => {
+          let fileContent = reader.result as string;
+          fileContent = fileContent.replace(/[\r\n]+/g, '');
 
-      reader.readAsText(file);
+          if (keyName === 'certificate') {
+            this.ecData.certificate = fileContent;
+          } else if (keyName === 'authenticationKey') {
+            this.ecData.authenticationKey = fileContent;
+          }
+        };
+        reader.readAsText(file);
+      }
+
     } else {
       console.log('Nenhum ficheiro selecionado.');
     }
@@ -68,17 +94,30 @@ export class ECRegister implements OnInit {
 
   onSubmit(form: NgForm) {
     if (this.ecData.authenticationKey == '' || this.ecData.certificate == ''){
-      alert('ERRO: Por favor, preencha todos os campos obrigatórios e verifique se o Certificado foi carregado corretamente.');
+      alert('Erro: Por favor, verifique se as Chaves foram carregadas corretamente.');
     }
     else if (form.valid) { 
-      alert('Registo de Entidade Aprovado.');
+      try {
+        this.authService.registerEC(this.ecData).subscribe({
+          next: (response: HttpResponse<any>) => {
+            if (response.status === 201 || response.status === 200) { 
+              alert('Registo efetuado com sucesso!');
+              setTimeout(() => this.router.navigateByUrl("login"), 1000); 
+            } else {
+              alert('Erro no registo. Por favor, tente novamente.');
+            }
+          },
+          error: (err) => {
+            console.error('Erro de registo:', err);
+            alert('Erro ao registar: ' + (err.error?.message || 'Erro de comunicação com o servidor.')); 
+          }
+        });
+      } catch (e) {
+        console.error('Erro inesperado:', e);
+        alert('Erro inesperado durante o registo.');
+      }
     } else {
-      alert('ERRO: Por favor, preencha todos os campos obrigatórios e verifique se o Certificado foi carregado corretamente.');
+      alert('Erro: Por favor, preencha todos os campos obrigatórios.');
     }
   }
 }
-
-
-//openssl genrsa -out ec_signing_key.pem 2048
-//openssl req -new -key ec_signing_key.pem -out ec_signing.csr
-//openssl x509 -req -days 365 -in ec_signing.csr -signkey ec_signing_key.pem -out ec_signing_cert.pem

@@ -1,144 +1,93 @@
-/* Container Principal: Centraliza o Formulário na Página (Similar ao .user-login-wrapper) */
 .registration-container {
   display: flex;
-  flex-direction: column; /* Organiza o conteúdo (título e formulário) verticalmente */
-  align-items: center; /* Centraliza horizontalmente */
-  min-height: 100vh; /* Ocupa a altura total da viewport */
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
   width: 100%;
-  padding: 30px 20px;
-  background: linear-gradient(135deg, #f7f9fc, #e8edf5); /* Fundo suave */
+  background: linear-gradient(135deg, #f7f9fc, #e8edf5);
   box-sizing: border-box;
 }
 
-/* Estilo do Formulário (Similar ao .login-card) */
-form {
+.registration-card {
   width: 100%;
-  max-width: 600px; /* Mais largo que um login card para acomodar o conteúdo */
+  margin-top: 150px;
+  max-width: 600px;
   padding: 2rem;
+  text-align: center;
   border-radius: 16px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
   background-color: #fff;
   transition: all 0.25s ease-in-out;
-  margin-top: 20px; /* Espaço após o título principal */
+  transform: translateY(-100px);
 }
 
-/* Estilo para Títulos */
-h1 {
-  color: #333;
-  font-size: 2.2rem;
-  margin-bottom: 0.5rem;
-  text-align: center;
-}
-
-h2 {
-  color: #4a4a4a;
-  font-size: 1.5rem;
-  border-bottom: 2px solid #e8edf5;
-  padding-bottom: 0.5rem;
-  margin-top: 2rem;
-  margin-bottom: 1.5rem;
-}
-
-h3 {
-  color: #555;
-  font-size: 1.2rem;
-  margin-top: 1.5rem;
-  margin-bottom: 0.8rem;
-}
-
-/* Seções do Formulário */
-section {
-  padding: 1rem 0;
-}
-
-/* Estilo dos Labels e Inputs/Textareas */
-label {
-  display: block; /* Garante que cada label e input fique numa nova linha */
-  font-weight: 500;
-  margin-top: 1rem;
-  margin-bottom: 0.4rem;
-  color: #555;
-}
-
-input[type="text"],
-input[type="number"],
-input[type="email"],
-input[type="tel"],
-textarea {
+mat-form-field {
   width: 100%;
-  padding: 0.75rem 1rem;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  font-size: 1rem;
-  box-sizing: border-box; /* Garante que padding e border não aumentam o width total */
-  transition: border-color 0.2s;
+  margin-bottom: 1rem;
 }
 
-textarea {
-  resize: vertical; /* Permite redimensionar apenas verticalmente */
-  min-height: 120px;
+.button-group {
+  display: flex;
+  flex-direction: column;
 }
 
-input:focus,
-textarea:focus {
-  border-color: #007bff; /* Cor de destaque ao focar */
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
-}
-
-/* Estilo específico para input de ficheiros */
-input[type="file"] {
-  border: 1px dashed #ccc;
-  padding: 1rem;
-  background-color: #f9f9f9;
-  cursor: pointer;
-}
-
-/* Pequenos textos de feedback/ajuda */
-small {
-  display: block;
-  margin-top: 0.5rem;
-  font-size: 0.85rem;
-  color: #777;
-}
-
-div[style*="color: red;"] {
-    font-size: 0.85rem;
-    margin-top: 0.5rem;
-    font-weight: 600;
-}
-
-
-/* Estilo do Botão de Submissão (Adaptado de button[mat-raised-button]) */
-button[type="submit"] {
-  width: 100%;
-  background-color: #007bff; /* Cor primária */
-  color: #fff;
-  border: none;
+button[mat-raised-button] {
+  margin-top: 40px;
   border-radius: 50px;
-  font-weight: 600;
-  padding: 0.8rem 0;
-  margin-top: 2rem;
-  cursor: pointer;
-  font-size: 1.1rem;
-  box-shadow: 0 3px 6px rgba(0, 123, 255, 0.2);
+  font-weight: 500;
+  padding: 1rem ;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.08);
   transition: all 0.2s ease-in-out;
 }
 
-button[type="submit"]:hover:not([disabled]) {
-  background-color: #0056b3;
+button[mat-raised-button]:hover {
   transform: translateY(-1px);
-  box-shadow: 0 5px 10px rgba(0, 123, 255, 0.3);
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.12);
 }
 
-button[type="submit"][disabled] {
-  background-color: #a0c3e8; /* Cor mais clara quando desativado */
-  cursor: not-allowed;
-  box-shadow: none;
+.feedback {
+  margin-top: 1.5rem;
 }
 
-#tipos {
-    display: flex; /* 1. Ativa o modo flexbox */
-    align-items: center; /* 2. Alinha os itens verticalmente ao centro (opcional, mas recomendado) */
-    gap: 20px; /* 3. Adiciona espaço entre os elementos (opcional, mas recomendado) */
+.message {
+  text-align: center;
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+.message.success {
+  color: #2e7d32;
+}
+
+.message.error {
+  color: #c62828;
+}
+
+.file-upload-wrapper{
+  padding: 1rem;
+  font-size: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.custom-file-upload input[type="file"] {
+    display: none; 
+}
+
+.custom-file-upload {
+    font-size: 14px;
+    border: 1px solid #ccc;
+    cursor: pointer; 
+    color: rgb(22, 20, 20); 
+    margin-top: 20px;
+    border-radius: 20px;
+    padding: 1rem ;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.08);
+    transition: all 0.2s ease-in-out;
+}
+
+.custom-file-upload:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.12);
 }
