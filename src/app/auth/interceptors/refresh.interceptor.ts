@@ -1,39 +1,27 @@
-import { Injectable, inject } from '@angular/core';
-import {
-  HttpInterceptor,
-  HttpRequest,
-  HttpHandler,
-  HttpEvent,
-  HttpErrorResponse
-} from '@angular/common/http';
-import { Observable, throwError, catchError, switchMap, of } from 'rxjs';
+import { inject } from '@angular/core';
+import { HttpInterceptorFn, HttpErrorResponse } from '@angular/common/http';
 import { AuthService } from '../services/auth.service';
+import { catchError, switchMap, throwError } from 'rxjs';
 
-@Injectable()
-export class RefreshInterceptor implements HttpInterceptor {
-  private isRefreshing = false;
+export const refreshInterceptor: HttpInterceptorFn = (req, next) => {
+  const authService = inject(AuthService);
 
-  intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    const authService = inject(AuthService);
-
-    return next.handle(req).pipe(
-      catchError((error: HttpErrorResponse) => {
-        // Se não for 401 → repassa o erro
-        if (error.status !== 401 || this.isRefreshing) {
-          return throwError(() => error);
-        }
-        this.isRefreshing = true;
-        return authService.refresh().pipe(
-          switchMap(() => {
-            this.isRefreshing = false;
-            return next.handle(req);
-          }),
-          catchError((refreshError) => {
-            this.isRefreshing = false;
-            return throwError(() => refreshError);
-          })
-        );
-      })
-    );
+  if (req.url.includes('/auth/refresh')) {
+    return next(req);
   }
-}
+  return next(req).pipe(
+    catchError((error: HttpErrorResponse) => {
+      if (error.status !== 401) {
+        return throwError(() => error);
+      }
+      return authService.refresh().pipe(
+        switchMap(() => {
+          return next(req);
+        }),
+        catchError((refreshError) => {
+          return throwError(() => refreshError);
+        })
+      );
+    })
+  );
+};
