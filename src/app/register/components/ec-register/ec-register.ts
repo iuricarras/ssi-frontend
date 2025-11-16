@@ -7,7 +7,7 @@ import { MatInputModule } from "@angular/material/input";
 import { MatButtonModule } from "@angular/material/button";
 import { MatSelectModule } from "@angular/material/select";
 import { Router } from "@angular/router";
-import { AuthService } from "../../services/register.service";
+import { RegisterService } from "../../services/register.service";
 import { HttpResponse } from "@angular/common/http";
 
 export interface ECRegistrationData {
@@ -52,7 +52,7 @@ export class ECRegister implements OnInit {
   areFilesUploaded: { auth: boolean, cert: boolean } = { auth: false, cert: false };
 
   constructor(
-    private authService: AuthService,
+    private registerService: RegisterService,
     private router: Router
   ) {}
 
@@ -98,7 +98,7 @@ export class ECRegister implements OnInit {
     }
     else if (form.valid) { 
       try {
-        this.authService.registerEC(this.ecData).subscribe({
+        this.registerService.registerEC(this.ecData).subscribe({
           next: (response: HttpResponse<any>) => {
             if (response.status === 201 || response.status === 200) { 
               alert('Registo efetuado com sucesso!');
@@ -109,7 +109,7 @@ export class ECRegister implements OnInit {
           },
           error: (err) => {
             console.error('Erro de registo:', err);
-            alert('Erro ao registar: ' + (err.error?.message || 'Erro de comunicação com o servidor.')); 
+            alert('Erro ao registar: ' + (err.error?.error || 'Erro de comunicação com o servidor.')); 
           }
         });
       } catch (e) {
