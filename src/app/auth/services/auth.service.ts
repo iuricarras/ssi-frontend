@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpResponse } from "@angular/common/http";
 import { Observable } from 'rxjs';
-import { ECRegistrationData } from '../pages/ec-register/ec-register';
 
 @Injectable({
   providedIn: 'root'
@@ -25,9 +24,5 @@ export class AuthService {
 
   public refresh(): Observable<any> {
     return this.http.post<any>(`${this.API}/refresh`, {}, { withCredentials: true });
-  }
-
-registerEC(data: ECRegistrationData): Observable<HttpResponse<void>> {
-    return this.http.post<void>(`${this.API}/register-ec`,{data},{observe: "response"});
   }
 }
