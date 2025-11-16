@@ -7,5 +7,9 @@ export const APP_ROUTES: Routes = [
     path: 'auth',
     loadChildren: () => import('./auth/auth.routes').then(m => m.AUTH_ROUTES),
   },
+  {
+    path: 'register',
+    loadChildren: () => import('./register/register.routes').then(m => m.REGISTER_ROUTES),
+  },
   { path: '**', redirectTo: '' },
 ];

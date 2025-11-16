@@ -7,7 +7,7 @@ import { MatInputModule } from "@angular/material/input";
 import { MatButtonModule } from "@angular/material/button";
 import { MatSelectModule } from "@angular/material/select";
 import { Router } from "@angular/router";
-import { AuthService } from "../../services/auth.service";
+import { AuthService } from "../../services/register.service";
 import { HttpResponse } from "@angular/common/http";
 
 export interface ECRegistrationData {

@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpResponse } from "@angular/common/http";
 import { Observable } from 'rxjs';
-import { ECRegistrationData } from '../components/ec-register/ec-register';
 
 @Injectable({
   providedIn: 'root'
@@ -17,9 +16,5 @@ requestLoginCode(email: string): Observable<HttpResponse<void>> {
 
 verifyLoginCode(code: string): Observable<HttpResponse<void>> {
     return this.http.post<void>(`${this.API}/verify-code`,{code},{observe: "response"});
-  }
-
-registerEC(data: ECRegistrationData): Observable<HttpResponse<void>> {
-    return this.http.post<void>(`${this.API}/register-ec`,{data},{observe: "response"});
   }
 }
