@@ -1,22 +1,30 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpResponse } from "@angular/common/http";
 import { Observable } from 'rxjs';
-import { ECRegistrationData } from '../components/ec-register/ec-register';
+import { ECRegistrationData } from '../pages/ec-register/ec-register';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private readonly API = '/api/auth';
+  private readonly API: string = 'http://localhost:5000/api/auth';
 
-  constructor(private http: HttpClient) {}
+  public constructor(private readonly http: HttpClient) {}
 
-requestLoginCode(email: string): Observable<HttpResponse<void>> {
-    return this.http.post<void>(`${this.API}/request-code`,{email},{observe: "response"});
+  public requestLoginCode(email: string): Observable<HttpResponse<any>> {
+    return this.http.post<any>(`${this.API}/start`, { email }, { observe: "response", withCredentials: true });
   }
 
-verifyLoginCode(code: string): Observable<HttpResponse<void>> {
-    return this.http.post<void>(`${this.API}/verify-code`,{code},{observe: "response"});
+  public verifyLoginCode(email: string, challenge_id: string, code: string): Observable<HttpResponse<any>> {
+    return this.http.post<any>(`${this.API}/verify`, { email, challenge_id, code }, { observe: "response", withCredentials: true });
+  }
+
+  public me(): Observable<any> {
+    return this.http.get<any>(`${this.API}/me`, { withCredentials: true });
+  }
+
+  public refresh(): Observable<any> {
+    return this.http.post<any>(`${this.API}/refresh`, {}, { withCredentials: true });
   }
 
 registerEC(data: ECRegistrationData): Observable<HttpResponse<void>> {

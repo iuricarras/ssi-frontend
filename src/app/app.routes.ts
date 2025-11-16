@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { HomeLogin } from './auth/components/home-login/home-login';
+import { HomeLogin } from './auth/pages/home-login/home-login';
 
 export const APP_ROUTES: Routes = [
   { path: '', component: HomeLogin },
