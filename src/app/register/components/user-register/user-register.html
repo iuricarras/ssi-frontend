@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="pt">
+  <head>
+    <meta charset="UTF-8" />
+    <title> User Register</title>
+  </head>
+<div class="container" role="main">
+  <div class="form-section">
+
+    <h2>Registo de Utilizador</h2>
+
+    <form #userForm="ngForm" (ngSubmit)="onSubmit(userForm)" class="registo-form">
+
+      <mat-form-field appearance="outline">
+        <mat-label>Username</mat-label>
+        <input 
+          matInput 
+          type="text"
+          name="username"
+          id="username"
+          required
+          [(ngModel)]="userData.username"
+          #username="ngModel"
+        >
+
+        <mat-error *ngIf="username.invalid && username.touched">
+          O username é obrigatório.
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Email</mat-label>
+        <input
+          matInput
+          type="email"
+          name="email"
+          id="email"
+          required
+          email
+          [(ngModel)]="userData.email"
+          #email="ngModel"
+        >
+
+        <mat-error *ngIf="email.errors?.['required'] && email.touched">
+          O email é obrigatório.
+        </mat-error>
+
+        <mat-error *ngIf="email.errors?.['email'] && email.touched">
+          Introduza um email válido.
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Password</mat-label>
+        <input
+          matInput
+          type="password"
+          name="password"
+          id="password"
+          required
+          minlength="6"
+          [(ngModel)]="userData.password"
+          #password="ngModel"
+        >
+
+        <mat-error *ngIf="password.errors?.['required'] && password.touched">
+          A password é obrigatória.
+        </mat-error>
+
+        <mat-error *ngIf="password.errors?.['minlength'] && password.touched">
+          A password deve ter pelo menos 6 caracteres.
+        </mat-error>
+      </mat-form-field>
+
+      <button 
+        mat-raised-button
+        color="primary"
+        type="submit"
+        class="registar"
+        [disabled]="!userForm.valid"
+      >
+        Registar
+      </button>
+
+    </form>
+  </div>
+
+  <div class="welcome-section">
+    <img src="assets/Images/BitsOfMeLogoRoxo.png" alt="Logotipo BitsOfMe" class="logo-bitsofme"/>
+
+    <p>Já possui conta? Faça Login</p>
+    <button type="button" (click)="goToLogin()">Login</button>
+  </div>
+</div>
