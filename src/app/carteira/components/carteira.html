@@ -1,0 +1,153 @@
+<div class="perfil-container">
+  <header class="header">
+    <nav class="nav-content">
+      
+      <div class="nav-left">
+        <div class="logo">
+          <a routerLink="/home">
+            <img src="logo.png" alt="Logo" class="logo-image">
+          </a>
+        </div>
+      </div>
+
+      <div class="search-bar">
+        <mat-icon class="search-icon">search</mat-icon>
+        <input type="text" placeholder="Pesquisar...">
+      </div>
+      
+      <div class="nav-right">
+        <mat-icon class="notification-icon">notifications</mat-icon>
+        <button mat-button routerLink="/home">HOME</button>
+        <button mat-button>LOG OUT</button>
+      </div>
+
+    </nav>
+  </header>
+
+  <div class="conteudo-perfil">
+    <div class="info-basica">
+      <div *ngIf="!isLoadingUserData" class="user-details">
+      <h2>{{ nome }}</h2>
+      <p><strong>Email:</strong> {{ email }}</p>
+      </div>
+      <div class="add-button">
+      <button *ngIf="dadosAcessiveis" (click)="adicionarInformacao()">
+        Adicionar Informação
+      </button>
+      </div>
+    </div>
+
+    <hr>
+
+    <div *ngIf="!dadosAcessiveis" class="div-chave-mestra">
+      <form (ngSubmit)="validarChaveMestra()">
+        <h3>Chave Mestra:</h3>
+        <input
+          type="password"
+          [(ngModel)]="input"
+          name="chaveMestra"
+          placeholder="Digite a chave mestra"
+          [disabled]="isLoading"
+          required
+        > 
+        <p *ngIf="mensagemErro" class="mensagemErro">{{ mensagemErro }}</p>
+      
+        <button type="submit" [disabled]="isLoading || !input.trim()">
+          <span *ngIf="isLoading">Verificando...</span>
+          <span *ngIf="!isLoading">Aceder à Carteira</span>
+        </button>
+      </form>
+    </div>
+
+    <div *ngIf="dadosAcessiveis" class="div-dados-pessoais">
+      
+      <!-- Dados Pessoais -->
+      <div *ngFor="let dado of getDadosPessoais()" class="item-dado">
+        <div class="dado-header">
+          <div class="dado-info">
+            <h3>{{ dado.chave }}</h3>
+            <p class="valor-dado">{{ dado.valor }}</p>
+          </div>
+          <div class="dado-actions">
+            <button class="btn-editar" (click)="editarDadoPessoal(dado)">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button class="btn-eliminar" (click)="eliminarDadoPessoal(dado)">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Certificados -->
+      <div *ngFor="let certificado of getCertificados()" class="item-dado">
+        <div class="dado-header">
+          <div class="dado-info">
+            <h3>{{ certificado.nome }}</h3>
+            <p class="certificado-label">Certificado</p>
+            
+            <!-- Campos do certificado -->
+            <div *ngFor="let campo of certificado.campos" class="campo-certificado">
+              <strong>{{ campo.chave }}:</strong> {{ campo.valor }}
+            </div>
+          </div>
+          <div class="dado-actions">
+            <button class="btn-eliminar" (click)="eliminarCertificado(certificado)">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+        </div>
+      </div>
+
+
+      <div *ngIf="dadosCarteira.length === 0" class="item-dado">
+        <h3>Carteira Vazia</h3>
+        <p class="valor-dado">Ainda não tem informação na sua carteira.</p>
+      </div>
+      
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Edição -->
+<div *ngIf="mostrarModal" class="modal-overlay" (click)="fecharModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>{{ modoEdicao ? 'Editar Informação' : 'Adicionar Informação' }}</h3>
+      <button class="modal-close" (click)="fecharModal()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+    
+    <div class="modal-body">
+      <div class="form-group">
+        <label for="nomeCampo">Nome do Campo:</label>
+        <input
+          id="nomeField"
+          type="text"
+          [(ngModel)]="novoNome"
+          placeholder="Digite o nome do campo"
+          class="form-input"
+        />
+      </div>
+      
+      <div class="form-group">
+        <label for="valorCampo">Valor:</label>
+        <input
+          id="valorField"
+          type="text"
+          [(ngModel)]="novoValor"
+          placeholder="Digite o valor"
+          class="form-input"
+        />
+      </div>
+    </div>
+    
+    <div class="modal-footer">
+      <button class="btn-cancelar" (click)="fecharModal()">Cancelar</button>
+      <button class="btn-salvar" (click)="salvarEdicao()" [disabled]="!novoNome.trim() || !novoValor.trim()">
+        {{ modoEdicao ? 'Salvar' : 'Adicionar' }}
+      </button>
+    </div>
+  </div>
+</div>

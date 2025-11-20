@@ -11,5 +11,9 @@ export const APP_ROUTES: Routes = [
     path: 'register',
     loadChildren: () => import('./register/register.routes').then(m => m.REGISTER_ROUTES),
   },
+  {
+    path: 'carteira',
+    loadChildren: () => import('./carteira/carteira.routes').then(m => m.CARTEIRA_ROUTES),
+  },
   { path: '**', redirectTo: '' },
 ];

@@ -1,4 +1,14 @@
-/* You can add global styles to this file, and also import other style files */
-
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+/* CORES */
+:root {
+  --purple: #5E17EB;    
+  --light-purple: #CFBCF7; 
+  --background: #F5F5F5;  
+  --background-white: #FFFFFF;  
+  --border-light: #E0E0E0; 
+  --text-white: #F5F5F5;
+  --text-dark: #1E1E1E; 
+  --error: #c62828;
+}
