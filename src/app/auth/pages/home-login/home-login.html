@@ -1,20 +1,29 @@
-<section class="home-login-wrapper">
-  <mat-card class="login-card">
-  <mat-card-header class="center-header">
-    <mat-card-title>Bits of Me</mat-card-title>
-    <mat-card-subtitle>Selecione o tipo de autenticação</mat-card-subtitle>
-  </mat-card-header>
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Autenticação</title>
 
+  <link rel="stylesheet" href="home-login.css">
+</head>
+<body>
+  <div class="left" aria-label="Logotipo">
+    <img src="/src/assets/BitsOfMeLogo.png" alt="Logotipo BitsOfMe" class="logo">
+  </div>
 
-    <mat-card-content class="button-group">
-      <button mat-raised-button color="primary" routerLink="/auth/user-login">
-        Sou Utilizador
-      </button>
-
-      <button mat-raised-button color="accent" routerLink="/auth/accrediting-agency-login">
-        Sou Entidade Credenciadora
-      </button>
-
-    </mat-card-content>
-  </mat-card>
-</section>
+  <div class="right">
+    <h1>BitsOfMe</h1>
+    <h2>Selecione o Tipo de Autenticação</h2>
+    <button class="utilizador" aria-label="Sou Utilizador" routerLink="/auth/user-login">
+      Sou Utilizador
+    </button>
+    <button class="credenciadora" aria-label="Sou Entidade Credenciadora" routerLink="/auth/accrediting-agency-login">
+      Sou Entidade Credenciadora
+    </button>
+    <button class="verificadora" aria-label="Sou Entidade Verificadora">
+      Sou Entidade Verificadora
+    </button>
+  </div>
+</body>
+</html>

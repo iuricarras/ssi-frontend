@@ -1,1 +1,33 @@
-<p>main-page works!</p>
+<div class="top-bar">
+
+  <div class="left-section">
+    <img src="assets/Images/BitsOfMeLogo.png" alt="BitsOfMe" class="logo">
+
+    <button mat-icon-button class="menu-btn">
+      <mat-icon>menu</mat-icon>
+    </button>
+
+    <div class="search-bar">
+      <mat-icon class="search-icon">search</mat-icon>
+      <input
+        type="text"
+        [(ngModel)]="searchText"
+        placeholder="Hinted search text"
+      />
+    </div>
+  </div>
+
+  <div class="right-section">
+    <mat-icon class="icon">notifications</mat-icon>
+
+    <a routerLink="/auth/main-page" class="nav-link">Home</a>
+    <a (click)="logout()" class="nav-link">Log Out</a>
+  </div>
+
+</div>
+
+<div class="content-box">
+  <p>
+    Intro text: Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+  </p>
+</div>
