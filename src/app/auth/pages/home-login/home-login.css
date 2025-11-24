@@ -42,7 +42,7 @@ body {
   margin-bottom: 20px;
 }
 
-button.utilizador, button.credenciadora, button.verificadora {
+button.utilizador, button.credenciadora {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -58,7 +58,7 @@ button.utilizador, button.credenciadora, button.verificadora {
   cursor: pointer;
 }
 
-button.utilizador:hover, button.credenciadora:hover, button.verificadora:hover {
+button.utilizador:hover, button.credenciadora:hover {
   background-color: #f0e8ff;
 }
 

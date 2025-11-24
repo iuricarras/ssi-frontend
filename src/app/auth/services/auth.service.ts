@@ -25,4 +25,14 @@ export class AuthService {
   public refresh(): Observable<any> {
     return this.http.post<any>(`${this.API}/refresh`, {}, { withCredentials: true });
   }
+
+  public startSignature(email: string): Observable<HttpResponse<any>> {
+    return this.http.post<any>(`${this.API}/signature/start`,{ email },{ observe: "response", withCredentials: true });
+  }
+
+  public verifySignature(email: string, challenge_id: string, signature: string): Observable<HttpResponse<any>> {
+    return this.http.post<any>(`${this.API}/signature/verify`,
+      { email, challenge_id, signature },{ observe: "response", withCredentials: true }
+    );
+  }
 }
