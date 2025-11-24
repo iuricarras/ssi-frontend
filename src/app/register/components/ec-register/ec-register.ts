@@ -9,6 +9,7 @@ import { MatSelectModule } from "@angular/material/select";
 import { Router } from "@angular/router";
 import { RegisterService } from "../../services/register.service";
 import { HttpResponse } from "@angular/common/http";
+import { MatIconModule } from '@angular/material/icon';
 
 export interface ECRegistrationData {
   name: string;
@@ -31,7 +32,8 @@ export interface ECRegistrationData {
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
-    MatSelectModule
+    MatSelectModule,
+    MatIconModule
   ],
   templateUrl: './ec-register.html',
   styleUrl: './ec-register.css'
@@ -119,5 +121,9 @@ export class ECRegister implements OnInit {
     } else {
       alert('Erro: Por favor, preencha todos os campos obrigatórios.');
     }
+  }
+
+  goToLogin() {
+    this.router.navigateByUrl("/auth/pages/accrediting-agency-login");
   }
 }
