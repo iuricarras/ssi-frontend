@@ -1,33 +1,49 @@
-<div class="top-bar">
+<header class="header">
+  <nav class="nav-content">
 
-  <div class="left-section">
-    <img src="assets/Images/BitsOfMeLogo.png" alt="BitsOfMe" class="logo">
-
-    <button mat-icon-button class="menu-btn">
-      <mat-icon>menu</mat-icon>
-    </button>
+    <div class="nav-left">
+      <div class="logo">
+        <a routerLink="/auth/main-page">
+          <img src="logo.png" alt="Logo" class="logo-image">
+        </a>
+      </div>
+    </div>
 
     <div class="search-bar">
       <mat-icon class="search-icon">search</mat-icon>
       <input
         type="text"
-        [(ngModel)]="searchText"
-        placeholder="Hinted search text"
+        placeholder="Pesquisar..."
+        [formControl]="searchControl"
+        [matAutocomplete]="auto"
       />
+      <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selectUser($event.option.value)">
+        <mat-option *ngFor="let user of searchResults" [value]="user.username">
+          {{ user.username }}
+        </mat-option>
+      </mat-autocomplete>
     </div>
-  </div>
 
-  <div class="right-section">
-    <mat-icon class="icon">notifications</mat-icon>
+    <div class="nav-right">
+      <mat-icon class="notification-icon">notifications</mat-icon>
 
-    <a routerLink="/auth/main-page" class="nav-link">Home</a>
-    <a (click)="logout()" class="nav-link">Log Out</a>
-  </div>
+      <button mat-button routerLink="/auth/main-page">HOME</button>
+      <button mat-button (click)="logout()">LOG OUT</button>
+    </div>
 
-</div>
+  </nav>
+</header>
+
 
 <div class="content-box">
-  <p>
-    Intro text: Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-  </p>
+
+  <div class="center-logo-container">
+    <img src="logobege.png" alt="BitsOfMe" class="center-logo">
+  </div>
+
+  <h1 class="slogan">
+    A tua identidade, <i>Bit a Bit</i>.
+  </h1>
+
 </div>
+
