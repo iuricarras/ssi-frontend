@@ -51,24 +51,24 @@
       </mat-form-field>
 
       <mat-form-field appearance="outline">
-        <mat-label>Password</mat-label>
+        <mat-label>Nome</mat-label>
         <input
           matInput
-          type="password"
-          name="password"
-          id="password"
+          type="nome"
+          name="nome"
+          id="nome"
           required
-          minlength="6"
-          [(ngModel)]="userData.password"
-          #password="ngModel"
+          minlength="1"
+          [(ngModel)]="userData.nome"
+          #nome="ngModel"
         >
 
-        <mat-error *ngIf="password.errors?.['required'] && password.touched">
-          A password é obrigatória.
+        <mat-error *ngIf="nome.errors?.['required'] && nome.touched">
+          O nome é obrigatório.
         </mat-error>
 
-        <mat-error *ngIf="password.errors?.['minlength'] && password.touched">
-          A password deve ter pelo menos 6 caracteres.
+        <mat-error *ngIf="nome.errors?.['minlength'] && nome.touched">
+          O nome não pode ser vazio.
         </mat-error>
       </mat-form-field>
 

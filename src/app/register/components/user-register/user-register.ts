@@ -10,7 +10,7 @@ import { RegisterService } from "../../services/register.service";
 export interface UserRegistrationData {
   username: string;
   email: string;
-  password: string;
+  nome: string;
 }
 
 @Component({
@@ -31,7 +31,7 @@ export class UserRegisterComponent {
   userData: UserRegistrationData = {
     username: "",
     email: "",
-    password: ""
+    nome: ""
   };
 
   constructor(

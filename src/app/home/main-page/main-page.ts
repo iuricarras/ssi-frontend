@@ -43,15 +43,15 @@ export class MainPage {
   }
 
   onSearch(query: string) {
-    if (!query.trim()) {
-      this.searchResults = [];
-      return;
-    }
-
-    this.userService.searchMock(query).subscribe(res => {
-      this.searchResults = res;
-    });
+  if (!query.trim()) {
+    this.searchResults = [];
+    return;
   }
+
+  this.userService.searchUsers(query).subscribe(res => {
+    this.searchResults = res;
+  });
+}
 
   selectUser(username: string) {
     this.searchControl.setValue(username);
