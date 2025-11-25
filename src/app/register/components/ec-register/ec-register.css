@@ -1,24 +1,38 @@
-.registration-container {
+:host {
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
   width: 100%;
-  background: linear-gradient(135deg, #f7f9fc, #e8edf5);
-  box-sizing: border-box;
+  background-color: var(--background);
+  font-size: 16px;
+}
+
+.container {
+  background-color: var(--background-white);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  border-radius: 20px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  display: flex;
+  max-width: 80vw;   
+  overflow: hidden;
 }
 
 .registration-card {
-  width: 100%;
-  margin-top: 150px;
-  max-width: 600px;
-  padding: 2rem;
-  text-align: center;
-  border-radius: 16px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-  background-color: #fff;
-  transition: all 0.25s ease-in-out;
-  transform: translateY(-100px);
+  padding: 40px;
+}
+
+form{
+  display: flex;
+  justify-content: space-between;
+  gap: 40px;
+}
+
+h1 {
+  font-size: 2.2rem;
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--purple);
 }
 
 mat-form-field {
@@ -26,23 +40,13 @@ mat-form-field {
   margin-bottom: 1rem;
 }
 
-.button-group {
+.left{
   display: flex;
   flex-direction: column;
-}
-
-button[mat-raised-button] {
-  margin-top: 40px;
-  border-radius: 50px;
-  font-weight: 500;
-  padding: 1rem ;
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.08);
-  transition: all 0.2s ease-in-out;
-}
-
-button[mat-raised-button]:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.12);
+  justify-content: space-between;
+  margin-left: 20px;
+  max-height: 65vh;
+  /* justify-content: center; */
 }
 
 .feedback {
@@ -76,18 +80,58 @@ button[mat-raised-button]:hover {
 }
 
 .custom-file-upload {
-    font-size: 14px;
-    border: 1px solid #ccc;
-    cursor: pointer; 
-    color: rgb(22, 20, 20); 
-    margin-top: 20px;
-    border-radius: 20px;
-    padding: 1rem ;
-    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.08);
-    transition: all 0.2s ease-in-out;
+  background-color: var(--purple);
+  color: var(--text-white);
+  padding: 12px 25px;
+  border: none;
+  border-radius: 50px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  max-width: 20vw;
+  align-self: center;
+  transition: background-color 0.3s ease;
+  margin-top: 20px;
 }
 
 .custom-file-upload:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.12);
+  transform: scale(1.05);
+}
+
+.left button {
+  /* margin-top: 100px; */
+  font-size: 16px;
+}
+
+.welcome-section {
+  padding: 40px 50px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 20vw;
+  background-color: var(--purple);
+  color: var(--text-white);
+  text-align: center;
+  border-radius: 60px 0 0 60px;
+}
+
+
+.logo-bitsofme {
+  width: 140px;
+  margin: 0 auto 20px auto;
+}
+
+
+.welcome-section button {
+  background: none;
+  border: 2px solid var(--text-white);
+  padding: 10px 40px;
+  border-radius: 25px;
+  color: var(--text-white);
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.welcome-section button:hover {
+  background-color: rgba(255,255,255,0.25);
 }

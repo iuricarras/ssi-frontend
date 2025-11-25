@@ -1,1 +1,49 @@
-<p>main-page works!</p>
+<header class="header">
+  <nav class="nav-content">
+
+    <div class="nav-left">
+      <div class="logo">
+        <a routerLink="/auth/main-page">
+          <img src="logo.png" alt="Logo" class="logo-image">
+        </a>
+      </div>
+    </div>
+
+    <div class="search-bar">
+      <mat-icon class="search-icon">search</mat-icon>
+      <input
+        type="text"
+        placeholder="Pesquisar..."
+        [formControl]="searchControl"
+        [matAutocomplete]="auto"
+      />
+      <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selectUser($event.option.value)">
+        <mat-option *ngFor="let user of searchResults" [value]="user.username">
+          {{ user.username }}
+        </mat-option>
+      </mat-autocomplete>
+    </div>
+
+    <div class="nav-right">
+      <mat-icon class="notification-icon">notifications</mat-icon>
+
+      <button mat-button routerLink="/auth/main-page">HOME</button>
+      <button mat-button (click)="logout()">LOG OUT</button>
+    </div>
+
+  </nav>
+</header>
+
+
+<div class="content-box">
+
+  <div class="center-logo-container">
+    <img src="logobege.png" alt="BitsOfMe" class="center-logo">
+  </div>
+
+  <h1 class="slogan">
+    A tua identidade, <i>Bit a Bit</i>.
+  </h1>
+
+</div>
+

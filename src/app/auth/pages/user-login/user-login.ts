@@ -111,4 +111,11 @@ export class UserLogin implements OnInit {
       this.errorMessage = "Erro inesperado durante a verificação do código.";
     }
   }
+
+
+
+  goToRegister(): void {
+    this.router.navigateByUrl("/user-register");
+  }
+
 }

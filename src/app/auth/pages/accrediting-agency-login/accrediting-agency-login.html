@@ -1,1 +1,69 @@
-<p>accrediting-agency-login works!</p>
+<section class="cred-login-wrapper">
+  <div class="cred-card">
+    <div class="center-header">
+      <h2>Login da Entidade Credenciadora</h2>
+    </div>
+
+    @if (!isNonceVisible) {
+      <form [formGroup]="emailForm" (ngSubmit)="startSignatureLogin()">
+        <mat-form-field appearance="outline">
+          <mat-label>E-mail da Entidade</mat-label>
+          <input matInput formControlName="email" type="email" />
+
+          @if (emailForm.get("email")?.hasError("required")) {
+            <mat-error>O e-mail é obrigatório.</mat-error>
+          }
+
+          @if (emailForm.get("email")?.hasError("email")) {
+            <mat-error>E-mail inválido.</mat-error>
+          }
+        </mat-form-field>
+
+        <div class="button-group">
+          <button
+            type="submit"
+            [disabled]="emailForm.invalid"
+            class="registar">
+            Iniciar Autenticação
+          </button>
+        </div>
+      </form>
+    }
+
+    @if (isNonceVisible) {
+      <div class="nonce-box">
+        <h3>Nonce para Assinatura</h3>
+        <p class="nonce-text">{{ nonce }}</p>
+      </div>
+
+      <form [formGroup]="signatureForm" (ngSubmit)="verifySignatureLogin()">
+        <div class="file-field">
+          <label for="signatureFile">Selecione o arquivo da assinatura</label>
+          <input id="signatureFile" type="file" (change)="onSignatureFileSelected($event)" accept=".bin"/>
+        </div>
+
+        @if (signatureForm.get("signature")?.hasError("required")) {
+          <mat-error>A assinatura é obrigatória.</mat-error>
+        }
+
+        <div class="button-group">
+          <button
+            type="submit"
+            [disabled]="signatureForm.invalid"
+            class="registar">
+            Verificar Assinatura
+          </button>
+        </div>
+      </form>
+    }
+
+    <div class="feedback">
+      @if (message) {
+        <p class="message success">{{ message }}</p>
+      }
+      @if (errorMessage) {
+        <p class="message error">{{ errorMessage }}</p>
+      }
+    </div>
+  </div>
+</section>

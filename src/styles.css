@@ -1,4 +1,200 @@
-/* You can add global styles to this file, and also import other style files */
-
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+/* CORES */
+:root {
+  --purple: #5E17EB;    
+  --light-purple: #CFBCF7; 
+  --background: #F5F5F5;  
+  --background-white: #FFFFFF;  
+  --border-light: #E0E0E0; 
+  --text-white: #F5F5F5;
+  --text-dark: #1E1E1E; 
+  --error: #c62828;
+}
+
+
+/* HEADER -------------------------------------------------------------------------------- */
+
+.header{
+    background-color: var(--purple);
+    color: var(--text-white);
+    padding: 0px 20px;
+    justify-content: space-between;
+    border-bottom-left-radius: 20px;
+    border-bottom-right-radius: 20px;
+}
+
+.header nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 15px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.logo-image {
+    height: 80px;
+    width: auto;
+    max-width: 150px;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+.search-icon {
+    color: var(--text-white);
+    font-size: 22px;
+}
+
+.notification-icon {
+    color: var(--text-white);
+    font-size: 26px;
+    cursor: pointer;
+    transition: color 0.3s ease;
+    margin-right: 15px;
+}
+.notification-icon:hover {
+    color: var(--light-purple);
+    transform: translateY(-1px);
+}
+
+.header .search-bar {
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+  padding: 12px 15px;
+  width: 100%;
+  max-width: 50vw;
+  min-width: 200px;
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+.header .search-bar input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text-white);
+  font-size: 16px;
+  margin-left: 10px;
+  width: 100%;
+}
+.header .search-bar input::placeholder {
+  color: var(--text-white);
+}
+
+.header .nav-right{
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.header button {
+    color: var(--text-white);
+    background-color: var(--purple);
+    border: none;
+    border-radius: 20px;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 16px;
+    letter-spacing: 1px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    white-space: nowrap;
+}
+
+.header button:hover {
+    color: var(--light-purple);
+    transform: translateY(-1px);
+}
+
+@media (max-width: 1200px) {
+    .header .search-bar {
+        max-width: 300px;
+    }
+    
+    .header .nav-right {
+        gap: 10px;
+    }
+    
+    .header button {
+        padding: 8px 15px;
+        font-size: 14px;
+    }
+    
+    .notification-icon {
+        margin-right: 10px;
+    }
+}
+
+@media (max-width: 768px) {
+    .header {
+        padding: 0px 15px;
+    }
+    
+    .header nav {
+        padding: 10px 5px;
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .logo-image {
+        height: 60px;
+    }
+    
+    .header .search-bar {
+        width: 100%;
+        max-width: none;
+        order: 2;
+    }
+    
+    .header .nav-right {
+        order: 1;
+        width: 100%;
+        justify-content: space-between;
+    }
+    
+    .header button {
+        padding: 8px 12px;
+        font-size: 14px;
+    }
+    
+    .notification-icon {
+        font-size: 24px;
+        margin-right: 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .header {
+        padding: 0px 10px;
+    }
+    
+    .header nav {
+        padding: 8px 0;
+    }
+    
+    .logo-image {
+        height: 50px;
+        max-width: 120px;
+    }
+    
+    .header .nav-right {
+        gap: 8px;
+    }
+    
+    .header button {
+        padding: 6px 10px;
+        font-size: 12px;
+    }
+    
+    .notification-icon {
+        font-size: 22px;
+    }
+    
+    .search-icon {
+        font-size: 20px;
+    }
+}
