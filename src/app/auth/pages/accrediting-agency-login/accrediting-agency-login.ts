@@ -32,6 +32,8 @@ export class AccreditingAgencyLogin implements OnInit {
   public nonce: string | null = null;
   public currentEmail: string | null = null;
 
+  public signatureFile: File | null = null;
+
   emailForm = new FormGroup({
     email: new FormControl("", [Validators.required, Validators.email])
   });
@@ -87,14 +89,23 @@ export class AccreditingAgencyLogin implements OnInit {
     }
   }
 
-  verifySignatureLogin(): void {
-    const signature = this.signatureForm.get("signature")?.value;
+  onSignatureFileSelected(event: any): void {
+    const file = event.target.files[0];
+    this.signatureFile = file || null;
 
+    if (this.signatureFile) {
+      this.signatureForm.get("signature")?.setValue("ok");
+    } else {
+      this.signatureForm.get("signature")?.setValue("");
+    }
+  }
+
+  verifySignatureLogin(): void {
     this.message = null;
     this.errorMessage = null;
 
-    if (!signature) {
-      this.errorMessage = "Por favor, insira a assinatura digital.";
+    if (!this.signatureFile) {
+      this.errorMessage = "Por favor, selecione o arquivo de assinatura.";
       return;
     }
 
@@ -104,7 +115,7 @@ export class AccreditingAgencyLogin implements OnInit {
     }
 
     try {
-      this.authService.verifySignature(this.currentEmail, this.challengeId, signature).subscribe({
+      this.authService.verifySignature(this.currentEmail, this.challengeId, this.signatureFile).subscribe({
         next: (response: HttpResponse<any>) => {
 
           if (response.status === 200 && response.body?.ok === true) {

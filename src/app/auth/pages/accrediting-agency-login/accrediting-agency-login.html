@@ -37,19 +37,14 @@
       </div>
 
       <form [formGroup]="signatureForm" (ngSubmit)="verifySignatureLogin()">
-        <mat-form-field appearance="outline">
-          <mat-label>Assinatura Digital (Base64)</mat-label>
-          <textarea
-            matInput
-            formControlName="signature"
-            rows="4"
-            style="resize: vertical"
-          ></textarea>
+        <div class="file-field">
+          <label for="signatureFile">Selecione o arquivo da assinatura</label>
+          <input id="signatureFile" type="file" (change)="onSignatureFileSelected($event)" accept=".bin"/>
+        </div>
 
-          @if (signatureForm.get("signature")?.hasError("required")) {
-            <mat-error>A assinatura é obrigatória.</mat-error>
-          }
-        </mat-form-field>
+        @if (signatureForm.get("signature")?.hasError("required")) {
+          <mat-error>A assinatura é obrigatória.</mat-error>
+        }
 
         <div class="button-group">
           <button

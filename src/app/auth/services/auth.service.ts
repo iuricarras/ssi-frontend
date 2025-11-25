@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpResponse } from "@angular/common/http";
-import { Observable } from 'rxjs';
+import { from, Observable, switchMap } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -30,9 +30,27 @@ export class AuthService {
     return this.http.post<any>(`${this.API}/signature/start`,{ email },{ observe: "response", withCredentials: true });
   }
 
-  public verifySignature(email: string, challenge_id: string, signature: string): Observable<HttpResponse<any>> {
-    return this.http.post<any>(`${this.API}/signature/verify`,
-      { email, challenge_id, signature },{ observe: "response", withCredentials: true }
+  public verifySignature(email: string, challenge_id: string, file: File): Observable<HttpResponse<any>> {
+    return from(this.fileToBase64(file)).pipe(
+      switchMap(signature => {
+        return this.http.post<any>(
+          `${this.API}/signature/verify`,
+          { email, challenge_id, signature },
+          { observe: "response", withCredentials: true }
+        );
+      })
     );
+  }
+
+  private fileToBase64(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const base64 = (reader.result as string).split(",")[1];
+        resolve(base64);
+      };
+      reader.onerror = () => reject("Erro ao ler arquivo");
+      reader.readAsDataURL(file);
+    });
   }
 }
