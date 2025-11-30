@@ -1,3 +1,4 @@
+
 <div class="perfil-container">
   <header class="header">
     <nav class="nav-content">
@@ -26,8 +27,9 @@
 
   <div class="conteudo-perfil">
     <div class="info-basica">
-      <div *ngIf="!isLoadingUserData" class="user-details">
+      <div class="user-details">
       <h2>{{ nome }}</h2>
+      <p><strong>Username:</strong> {{ username }}</p>
       <p><strong>Email:</strong> {{ email }}</p>
       </div>
       <div class="add-button">
@@ -47,14 +49,12 @@
           [(ngModel)]="input"
           name="chaveMestra"
           placeholder="Digite a chave mestra"
-          [disabled]="isLoading"
           required
         > 
         <p *ngIf="mensagemErro" class="mensagemErro">{{ mensagemErro }}</p>
       
-        <button type="submit" [disabled]="isLoading || !input.trim()">
-          <span *ngIf="isLoading">Verificando...</span>
-          <span *ngIf="!isLoading">Aceder à Carteira</span>
+        <button type="submit" [disabled]="!input.trim()">
+          <span>Aceder à Carteira</span>
         </button>
       </form>
     </div>
@@ -146,7 +146,46 @@
     <div class="modal-footer">
       <button class="btn-cancelar" (click)="fecharModal()">Cancelar</button>
       <button class="btn-salvar" (click)="salvarEdicao()" [disabled]="!novoNome.trim() || !novoValor.trim()">
-        {{ modoEdicao ? 'Salvar' : 'Adicionar' }}
+        {{ modoEdicao ? 'Guardar' : 'Adicionar' }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de inserir a chave mestra ao editar, adicionar, remover -->
+<div *ngIf="mostrarModalChaveMestra" class="modal-overlay" (click)="fecharModalChaveMestra()">
+  <div class="modal-content modal-chave" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Confirmar Operação</h3>
+      <button class="modal-close" (click)="fecharModalChaveMestra()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+    
+    <div class="modal-body">
+      <p class="confirmacao-texto">
+        Para confirmar esta operação, insira a sua chave mestra:
+      </p>
+      
+      <div class="form-group">
+        <label for="chaveMestraConfirmacao">Chave Mestra:</label>
+        <input
+          id="chaveMestraConfirmacao"
+          type="password"
+          [(ngModel)]="chaveMestraInput"
+          placeholder="Digite a sua chave mestra"
+          class="form-input"
+          (keyup.enter)="confirmarChaveMestra()"
+        />
+      </div>
+      
+      <p *ngIf="mensagemErroChave" class="mensagem-erro-chave">{{ mensagemErroChave }}</p>
+    </div>
+    
+    <div class="modal-footer">
+      <button class="btn-cancelar" (click)="fecharModalChaveMestra()">Cancelar</button>
+      <button class="btn-confirmar" (click)="confirmarChaveMestra()" [disabled]="!chaveMestraInput.trim()">
+        Confirmar
       </button>
     </div>
   </div>
