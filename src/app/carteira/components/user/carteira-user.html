@@ -1,0 +1,154 @@
+<div class="perfil-container">
+  <header class="header">
+    <nav class="nav-content">
+      
+      <div class="nav-left">
+        <div class="logo">
+          <a routerLink="/home">
+            <img src="logo.png" alt="Logo" class="logo-image">
+          </a>
+        </div>
+      </div>
+
+      <div class="search-bar">
+        <mat-icon class="search-icon">search</mat-icon>
+        <input type="text" placeholder="Pesquisar...">
+      </div>
+      
+      <div class="nav-right">
+        <mat-icon class="notification-icon">notifications</mat-icon>
+        <button mat-button routerLink="/home">HOME</button>
+        <button mat-button>LOG OUT</button>
+      </div>
+
+    </nav>
+  </header>
+
+  <div class="conteudo-perfil">
+    <div class="info-basica">
+      <div class="user-details">
+      <h2>{{ nome }}</h2>
+      <p><strong>Username:</strong> {{ username }}</p>
+      <p><strong>Email:</strong> {{ email }}</p>
+      </div>
+      <div *ngIf="certificadora" class="add-button">
+        <button class="btn-add" (click)="abrirModalEnviar()">
+          Enviar Certificado
+        </button>
+      </div>
+    </div>
+
+    <hr>
+
+    <div class="div-dados-pessoais">
+      
+      <!-- Dados Pessoais -->
+      <div *ngFor="let dado of getDadosPessoais()" class="item-dado">
+        <div class="dado-header">
+          <div class="dado-info">
+            <h3>{{ dado.chave }}</h3>
+          </div>
+              <div class="dado-actions">
+                <button class="btn-request" (click)="abrirConfirmacaoPedido(dado)">
+                  Pedir Informação
+                </button>
+              </div>
+        </div>
+      </div>
+
+      <!-- Certificados -->
+      <div *ngFor="let certificado of getCertificados()" class="item-dado">
+        <div class="dado-header">
+          <div class="dado-info">
+            <h3>{{ certificado.nome }}</h3>
+            <p class="certificado-label">Certificado</p>
+          </div>
+          <div class="dado-actions">
+            <button class="btn-request" (click)="abrirConfirmacaoPedido(certificado)">
+              Pedir Informação
+            </button>
+          </div>
+        </div>
+      </div>
+
+
+      <div *ngIf="dadosCarteira.length === 0" class="item-dado">
+        <h3>Carteira Vazia</h3>
+        <p class="valor-dado">Ainda não tem informação na sua carteira.</p>
+      </div>
+      
+    </div>
+  </div>
+</div>
+
+
+<!-- Modal de confirmação para Pedido de Informação -->
+<div *ngIf="mostrarModalConfirmacao" class="modal-overlay" (click)="fecharConfirmacao()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Confirmar Pedido de Informação</h3>
+      <button class="modal-close" (click)="fecharConfirmacao()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <p>Pretende pedir a seguinte informação?</p>
+      <div class="form-group">
+        <label>Item:</label>
+        <div class="valor-dado">{{ itemSelecionado?.chave || itemSelecionado?.nome }}</div>
+      </div>
+      <div class="form-group">
+        <label>Mensagem (opcional):</label>
+        <input class="form-input" type="text" [(ngModel)]="mensagemPedido" placeholder="Mensagem..." />
+      </div>
+      <div class="form-group">
+        <label>Chave-Mestra *: </label>
+        <input class="form-input" type="text" [(ngModel)]="chavePedido" name="chavePedido" placeholder="Insira uma chave" required />
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-cancelar" (click)="fecharConfirmacao()">Cancelar</button>
+      <button class="btn-confirmar" (click)="confirmarPedido()" [disabled]="!chavePedido || (chavePedido && chavePedido.trim() === '')">Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal/form para Enviar Certificado (apenas para certificadora) -->
+<div *ngIf="mostrarModalEnviarCertificado" class="modal-overlay" (click)="fecharModalEnviar()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Enviar Certificado</h3>
+      <button class="modal-close" (click)="fecharModalEnviar()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <form (ngSubmit)="enviarCertificado()">
+        <div class="form-group">
+          <label for="nomeCertificado">Nome do Certificado</label>
+          <input id="nomeCertificado" class="form-input" type="text" [(ngModel)]="certForm.nome" name="nome" required />
+        </div>
+
+        <div class="form-group">
+          <label>Campos do Certificado</label>
+          <div *ngFor="let campo of certForm.campos; let i = index" class="campo-dinamico">
+            <input class="form-input" type="text" [(ngModel)]="campo.chave" name="campoChave{{i}}" placeholder="Nome do campo (ex: curso, nota)" required />
+            <input class="form-input" type="text" [(ngModel)]="campo.valor" name="campoValor{{i}}" placeholder="Valor do campo" />
+            <button type="button" class="btn-cancelar" (click)="removerCampo(i)">Remover</button>
+          </div>
+          <div style="margin-top:8px;">
+            <button type="button" class="btn-salvar" (click)="adicionarCampo()">Adicionar Campo</button>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn-cancelar" type="button" (click)="fecharModalEnviar()">Cancelar</button>
+          <button class="btn-salvar" type="submit" [disabled]="!certForm.nome.trim() || !certForm.entidade.trim() || !certForm.campos || certForm.campos.length === 0">Enviar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
