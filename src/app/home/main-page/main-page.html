@@ -13,7 +13,7 @@
       <mat-icon class="search-icon">search</mat-icon>
       <input
         type="text"
-        placeholder="Pesquisar..."
+        placeholder="Pesquisar utilizador..."
         [formControl]="searchControl"
         [matAutocomplete]="auto"
       />
@@ -27,7 +27,7 @@
     <div class="nav-right">
       <mat-icon class="notification-icon">notifications</mat-icon>
 
-      <button mat-button routerLink="/auth/main-page">HOME</button>
+      <button mat-button routerLink="/carteira">CARTEIRA</button>
       <button mat-button (click)="logout()">LOG OUT</button>
     </div>
 
