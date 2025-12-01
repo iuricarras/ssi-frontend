@@ -134,4 +134,8 @@ export class AccreditingAgencyLogin implements OnInit {
       this.errorMessage = "Erro inesperado ao verificar assinatura.";
     }
   }
+
+  goToRegister(): void {
+    this.router.navigateByUrl("register/ec-register");
+  }
 }

@@ -115,7 +115,7 @@ export class UserLogin implements OnInit {
 
 
   goToRegister(): void {
-    this.router.navigateByUrl("/user-register");
+    this.router.navigateByUrl("register/user-register");
   }
 
 }

@@ -124,6 +124,6 @@ export class ECRegister implements OnInit {
   }
 
   goToLogin() {
-    this.router.navigateByUrl("/auth/pages/accrediting-agency-login");
+    this.router.navigateByUrl("/auth/accrediting-agency-login");
   }
 }

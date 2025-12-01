@@ -58,6 +58,6 @@ export class UserRegisterComponent {
   }
 
   goToLogin() {
-    this.router.navigateByUrl("/auth/pages/user-login");
+    this.router.navigateByUrl("/auth/user-login");
   }
 }
