@@ -8,7 +8,7 @@ import { delay } from "rxjs/operators";
 })
 export class UserService {
 
-  private apiUrl = "http://localhost:3000/user";
+  private apiUrl = "http://localhost:5000/api/user";
 
   constructor(private http: HttpClient) {}
 
