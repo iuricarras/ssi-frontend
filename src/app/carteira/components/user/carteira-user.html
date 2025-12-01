@@ -135,7 +135,7 @@
         <div class="form-group">
           <label>Campos do Certificado</label>
           <div *ngFor="let campo of certForm.campos; let i = index" class="campo-dinamico">
-            <input class="form-input" type="text" [(ngModel)]="campo.chave" name="campoChave{{i}}" placeholder="Nome do campo (ex: curso, nota)" required />
+            <input class="form-input" type="text" [(ngModel)]="campo.chave" name="campoChave{{i}}" placeholder="Nome do campo (ex: curso, nota)" />
             <input class="form-input" type="text" [(ngModel)]="campo.valor" name="campoValor{{i}}" placeholder="Valor do campo" />
             <button type="button" class="btn-cancelar" (click)="removerCampo(i)">Remover</button>
           </div>
@@ -146,7 +146,7 @@
 
         <div class="modal-footer">
           <button class="btn-cancelar" type="button" (click)="fecharModalEnviar()">Cancelar</button>
-          <button class="btn-salvar" type="submit" [disabled]="!certForm.nome.trim() || !certForm.entidade.trim() || !certForm.campos || certForm.campos.length === 0">Enviar</button>
+          <button class="btn-salvar" type="submit" [disabled]="!certForm.nome.trim() || !certForm.entidade.trim()">Enviar</button>
         </div>
       </form>
     </div>

@@ -100,26 +100,33 @@ export class CarteiraUser implements OnInit {
   // Modal para enviar certificado 
   abrirModalEnviar() {
     this.mostrarModalEnviarCertificado = true;
-    this.certForm = { nome: '', entidade: this.emissorNome || '', emissao: this.getTodayIsoDate(), campos: [{ chave: '', valor: '' }] };
+    this.certForm = { nome: '', entidade: this.emissorNome || '', emissão: this.getTodayIsoDate(), campos: [{ chave: '', valor: '' }] };
   }
   fecharModalEnviar() {
     this.mostrarModalEnviarCertificado = false;
     this.certForm = { nome: '', entidade: '', emissao: '', campos: [] };
   }
   enviarCertificado() {
-    // filtrar campos vazios
     const camposFiltrados = (this.certForm.campos || []).filter((c: any) => c && c.chave && c.chave.toString().trim() !== '');
-    const payload = {
+    const camposObj: any = {};
+    camposFiltrados.forEach((c: any) => {
+      if (c && c.chave) {
+        camposObj[c.chave] = c.valor;
+      }
+    });
+    const payload: any = {
       nome: this.certForm.nome,
       entidade: this.certForm.entidade,
-      emissao: this.certForm.emissao,
-      campos: camposFiltrados
+      emissão: this.certForm.emissão,
+      ...camposObj
     };
+
     if (this.developmentMode) {
-      console.log('Simulated sendCertificate payload:', payload);
+      console.log('Simulated sendCertificate payload (flattened):', payload);
       this.fecharModalEnviar();
       return;
     }
+
     this.carteiraService.sendCertificate(this.username, payload).subscribe({
       next: (resp) => {
         this.fecharModalEnviar();
