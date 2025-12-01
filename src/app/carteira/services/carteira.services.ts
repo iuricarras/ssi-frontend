@@ -43,4 +43,36 @@ export class CarteiraService {
       { observe: "response", withCredentials: true }
     );
   }
+<<<<<<< Updated upstream
 }
+=======
+
+
+  // para visualizar carteiras por username
+  getUserDataByUsername(username: string): Observable<UserData> {
+    return this.http.get<UserData>(`${this.API}/carteira/user/${encodeURIComponent(username)}/profile`, { withCredentials: true });
+  }
+  getCarteiraDataByUsername(username: string): Observable<CarteiraData> {
+    return this.http.get<CarteiraData>(`${this.API}/carteira/user/${encodeURIComponent(username)}`, { withCredentials: true });
+  }
+
+  // enviar pedidos e certificados
+  sendCertificate(username: string, certificate: any): Observable<HttpResponse<any>> {
+    return this.http.post<any>(`${this.API}/carteira/user/${encodeURIComponent(username)}/certificates`,
+      certificate,
+      { observe: 'response', withCredentials: true }
+    );
+  }
+  requestInfo(username: string, payload: { item: any; mensagem?: string }): Observable<HttpResponse<any>> {
+    return this.http.post<any>(`${this.API}/carteira/user/${encodeURIComponent(username)}/request-info`,
+      payload,
+      { observe: 'response', withCredentials: true }
+    );
+  }
+
+
+
+
+
+}
+>>>>>>> Stashed changes
