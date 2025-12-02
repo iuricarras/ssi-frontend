@@ -15,5 +15,9 @@ export const APP_ROUTES: Routes = [
     path: 'carteira',
     loadChildren: () => import('./carteira/carteira.routes').then(m => m.CARTEIRA_ROUTES),
   },
+    {
+    path: 'home',
+    loadChildren: () => import('./home/home.routes').then(m => m.HOME_ROUTES),
+  },
   { path: '**', redirectTo: '' },
 ];

@@ -49,7 +49,7 @@ export class AccreditingAgencyLogin implements OnInit {
 
   ngOnInit(): void {
     this.authService.me().subscribe({
-      next: () => this.router.navigateByUrl("/auth/main-page"),
+      next: () => this.router.navigateByUrl("/home/main-page"),
       error: () => {}
     });
   }
@@ -120,7 +120,7 @@ export class AccreditingAgencyLogin implements OnInit {
 
           if (response.status === 200 && response.body?.ok === true) {
             this.message = "Assinatura validada. Autenticação concluída.";
-            setTimeout(() => this.router.navigateByUrl("/auth/main-page"), 1000);
+            setTimeout(() => this.router.navigateByUrl("/home/main-page"), 1000);
           } else {
             this.errorMessage = "Assinatura inválida.";
           }

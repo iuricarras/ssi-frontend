@@ -20,7 +20,7 @@ export class HomeLogin implements OnInit {
 
   ngOnInit(): void {
     this.authService.me().subscribe({
-      next: () => { this.router.navigateByUrl("/auth/main-page"); },
+      next: () => { this.router.navigateByUrl("/home/main-page"); },
       error: () => {}
     });
   }

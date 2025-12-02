@@ -44,7 +44,7 @@ export class UserLogin implements OnInit {
 
   ngOnInit(): void {
     this.authService.me().subscribe({
-      next: () => { this.router.navigateByUrl("/auth/main-page"); },
+      next: () => { this.router.navigateByUrl("/home/main-page"); },
       error: () => {}
     });
   }
@@ -98,7 +98,7 @@ export class UserLogin implements OnInit {
         next: (response: HttpResponse<any>) => {
           if (response.status === 200) {
             this.message = "Login efetuado com sucesso.";
-            setTimeout(() => this.router.navigateByUrl("/auth/main-page"), 1000);
+            setTimeout(() => this.router.navigateByUrl("/home/main-page"), 1000);
           } else {
             this.errorMessage = "Código inválido. Verifique e tente novamente.";
           }
