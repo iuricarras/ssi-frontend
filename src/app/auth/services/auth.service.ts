@@ -22,6 +22,10 @@ export class AuthService {
     return this.http.get<any>(`${this.API}/me`, { withCredentials: true });
   }
 
+  public logout(): Observable<any> {
+    return this.http.post<any>(`${this.API}/logout`,{},{ withCredentials: true });
+}
+
   public refresh(): Observable<any> {
     return this.http.post<any>(`${this.API}/refresh`, {}, { withCredentials: true });
   }

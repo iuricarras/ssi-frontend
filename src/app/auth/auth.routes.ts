@@ -10,7 +10,7 @@ import { UserRegisterComponent } from "../register/components/user-register/user
 
 export const AUTH_ROUTES: Routes = [
     { path: 'home-login', component: HomeLogin },
-    { path: 'main-page', component: MainPage/* , canActivate: [authGuard] */ },   
+    { path: 'main-page', component: MainPage, canActivate: [authGuard] },   
     { path: 'user-login', component: UserLogin },
     { path: 'accrediting-agency-login', component: AccreditingAgencyLogin },
     { path: "user-register", component: UserRegisterComponent }

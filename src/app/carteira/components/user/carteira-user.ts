@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { RouterModule, ActivatedRoute } from '@angular/router';
+import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { CarteiraService, UserData, CarteiraData } from '../../services/carteira.services';
+import { AuthService } from '../../../auth/services/auth.service';
 
 @Component({
   selector: 'app-carteira-user',
@@ -46,6 +47,8 @@ export class CarteiraUser implements OnInit {
   emissorNome: string = '';
 
   constructor(
+    private router: Router,
+    private authService: AuthService,
     private carteiraService: CarteiraService,
     private route: ActivatedRoute
   ) {}
@@ -259,5 +262,17 @@ export class CarteiraUser implements OnInit {
 
   getCertificados(): any[] {
     return this.dadosCarteira.filter(dado => dado.tipo === 'certificate');
+  }
+
+  public onLogout(): void {
+    this.authService.logout().subscribe({
+      next: (): void => {
+        this.router.navigateByUrl('/auth/home-login');
+      },
+      error: (err: unknown): void => {
+        console.error(err);
+        this.router.navigateByUrl('/auth/home-login');
+      }
+    });
   }
 }

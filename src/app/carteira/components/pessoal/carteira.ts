@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { CarteiraService, UserData } from '../../services/carteira.services';
+import { AuthService } from '../../../auth/services/auth.service';
 
 @Component({
   selector: 'app-carteira',
@@ -45,7 +46,11 @@ export class Carteira implements OnInit {
   developmentMode: boolean = false;
   testMasterKey: string = '123';
 
-  constructor(private carteiraService: CarteiraService) {}
+  constructor(
+    private router: Router,
+    private carteiraService: CarteiraService, 
+    private authService: AuthService) {}
+  
 
   ngOnInit() {
     this.carregarDadosUtilizador();
@@ -329,6 +334,17 @@ export class Carteira implements OnInit {
       error: (error) => {
         console.error('Erro ao atualizar carteira', error);
         alert('Erro ao salvar alterações. Tente novamente.');
+      }
+    });
+  }
+  public onLogout(): void {
+    this.authService.logout().subscribe({
+      next: (): void => {
+        this.router.navigateByUrl('/auth/home-login');
+      },
+      error: (err: unknown): void => {
+        console.error(err);
+        this.router.navigateByUrl('/auth/home-login');
       }
     });
   }
