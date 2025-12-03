@@ -1,12 +1,13 @@
 import { Component, OnInit } from '@angular/core';
-import { FormsModule, ReactiveFormsModule, FormControl } from '@angular/forms';
+import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
-import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { CarteiraService, UserData, CarteiraData } from '../../services/carteira.services';
 import { AuthService } from '../../../auth/services/auth.service';
 import { UserService } from '../../../home/main-page/services/user.service';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'app-carteira-user',
@@ -15,32 +16,35 @@ import { UserService } from '../../../home/main-page/services/user.service';
     FormsModule,
     CommonModule,
     RouterModule,
+    MatIconModule,
+    MatButtonModule,
     ReactiveFormsModule,
-    MatAutocompleteModule,
-    MatIconModule
+    MatAutocompleteModule
   ],
   templateUrl: './carteira-user.html',
   styleUrls: ['./carteira-user.css']
 })
-
 export class CarteiraUser implements OnInit {
+  // --- Variáveis de Estado ---
   mensagemErro: string = '';
-  developmentMode: boolean = false;
   
+  // Dados do Utilizador (Perfil Visualizado)
   nome: string = '';
   username: string = '';
   email: string = '';
   dadosCarteira: any[] = [];
 
+  // Permissões e Flags
   dadosAcessiveis: boolean = false; 
   certificadora: boolean = false;
 
-  // Modals
+  // --- Modals: Pedido de Informação ---
   mostrarModalConfirmacao: boolean = false;
   itemSelecionado: any = null;
   mensagemPedido: string = '';
   chavePedido: string = '';
 
+  // --- Modals: Envio de Certificado ---
   mostrarModalEnviarCertificado: boolean = false;
   certForm: any = {
     nome: '',
@@ -49,120 +53,77 @@ export class CarteiraUser implements OnInit {
     campos: [] as Array<{ chave: string; valor: string }>
   };
   emissorNome: string = '';
+  dataEmissao: string = '';
+  signatureContent: string | null = null;
+  lastGeneratedJson: string | null = null;
 
-  // Pesquisa
+  // --- Pesquisa ---
   searchControl = new FormControl('');
   searchResults: any[] = [];
 
   constructor(
     private router: Router,
-    private authService: AuthService,
     private carteiraService: CarteiraService,
     private route: ActivatedRoute,
-    private userService: UserService
+    private userService: UserService,
+    private authService: AuthService
   ) {}
 
+
   ngOnInit() {
-    // obter utilizador da URL
+    // 1. Obter username da URL e carregar dados públicos da carteira
     this.route.params.subscribe(params => {
       this.username = params['username'];
-      this.carregarDadosUtilizador();
       this.carregarDadosCarteiraPublica();
     });
-    // obter info do utilizador autenticado
+
+    // 2. Obter info do utilizador autenticado (para saber se é certificadora, etc.)
     this.loadAuthenticatedName();
+    this.dataEmissao = this.getTodayIsoDate();
 
-    // Pesquisa
-    this.searchControl.valueChanges.subscribe(value => this.onSearch(value || ''));
+    this.searchControl.valueChanges.subscribe(value => {
+      this.onSearch(value || '');
+    });
   }
 
-  // Abre modal de confirmação para pedir informação
-  abrirConfirmacaoPedido(item: any) {
-    this.itemSelecionado = item;
-    this.mensagemPedido = '';
-    this.chavePedido = '';
-    this.mostrarModalConfirmacao = true;
-  }
-  fecharConfirmacao() {
-    this.mostrarModalConfirmacao = false;
-    this.itemSelecionado = null;
-    this.mensagemPedido = '';
-    this.chavePedido = '';
-  }
-  confirmarPedido() {
-    if (!this.itemSelecionado) return;
-    if (!this.chavePedido || this.chavePedido.trim() === '') {
-      this.mensagemErro = 'É necessário fornecer uma chave para o pedido.';
-      return;
-    }
-    const payload = { item: this.itemSelecionado, mensagem: this.mensagemPedido, chave: this.chavePedido };
-    if (this.developmentMode) {
-      console.log('Simulated requestInfo payload:', payload);
-      this.fecharConfirmacao();
-      return;
-    }
-    this.carteiraService.requestInfo(this.username, payload).subscribe({
-      next: (resp) => {
-        this.fecharConfirmacao();
+  // ==================================================================================
+  // 1. Carregamento de Dados (Perfil e Carteira)
+  // ==================================================================================
+
+  /**
+   * Carrega os dados públicos do utilizador (nome, email) e os itens da sua carteira.
+   */
+  carregarDadosCarteiraPublica() {
+    // Dados básicos do utilizador
+    this.carteiraService.getUserDataByUsername(this.username).subscribe({
+      next: (userData: UserData) => {
+        this.nome = userData.nome;
+        this.email = userData.email || '';
+        this.username = userData.username || "";
       },
-      error: (err) => {
-        this.mensagemErro = 'Erro ao enviar pedido de informação.';
-        this.fecharConfirmacao();
+      error: (error: any) => {
+        this.nome = 'Utilizador não encontrado';
+      }
+    });
+
+    // Dados da carteira (apenas estrutura pública)
+    this.carteiraService.getCarteiraDataByUsername(this.username).subscribe({
+      next: (carteiraData: CarteiraData) => {
+        this.dadosCarteira = this.processarDadosCarteira(carteiraData);
       }
     });
   }
 
-  // Modal para enviar certificado 
-  abrirModalEnviar() {
-    this.mostrarModalEnviarCertificado = true;
-    this.certForm = { nome: '', entidade: this.emissorNome || '', emissão: this.getTodayIsoDate(), campos: [{ chave: '', valor: '' }] };
-  }
-  fecharModalEnviar() {
-    this.mostrarModalEnviarCertificado = false;
-    this.certForm = { nome: '', entidade: '', emissao: '', campos: [] };
-  }
-  enviarCertificado() {
-    const camposFiltrados = (this.certForm.campos || []).filter((c: any) => c && c.chave && c.chave.toString().trim() !== '');
-    const camposObj: any = {};
-    camposFiltrados.forEach((c: any) => {
-      if (c && c.chave) {
-        camposObj[c.chave] = c.valor;
-      }
-    });
-    const payload: any = {
-      nome: this.certForm.nome,
-      entidade: this.certForm.entidade,
-      emissão: this.certForm.emissão,
-      ...camposObj
-    };
-
-    if (this.developmentMode) {
-      console.log('Simulated sendCertificate payload (flattened):', payload);
-      this.fecharModalEnviar();
-      return;
-    }
-
-    this.carteiraService.sendCertificate(this.username, payload).subscribe({
-      next: (resp) => {
-        this.fecharModalEnviar();
-      },
-      error: (err) => {
-        this.mensagemErro = 'Erro ao enviar certificado.';
-        this.fecharModalEnviar();
-      }
-    });
-  }
-
+  /**
+   * Carrega dados do utilizador autenticado (quem está a ver a página).
+   * Útil para preencher o nome do emissor se for uma certificadora.
+   */
   loadAuthenticatedName() {
-    if (this.developmentMode) {
-      this.emissorNome = 'Entidade Emissora';
-      this.certificadora = true;
-      return;
-    }
     this.carteiraService.getUserData().subscribe({
       next: (user) => {
-        this.emissorNome = user?.name || '';
-        this.certificadora = !!(user && (user as any).nif); // se tem nif é certificadora
+        this.emissorNome = user.nome;
+        console.log('User data loaded:', user);
+        this.certificadora = !!(user && user.isEC);
       },
       error: () => {
         this.emissorNome = '';
@@ -171,71 +132,9 @@ export class CarteiraUser implements OnInit {
     });
   }
 
-  getTodayIsoDate(): string {
-    const d = new Date();
-    const yyyy = d.getFullYear();
-    const mm = String(d.getMonth() + 1).padStart(2, '0');
-    const dd = String(d.getDate()).padStart(2, '0');
-    return `${dd}-${mm}-${yyyy}`;
-  }
-
-  adicionarCampo() {
-    if (!this.certForm.campos) this.certForm.campos = [];
-    this.certForm.campos.push({ chave: '', valor: '' });
-  }
-
-  removerCampo(index: number) {
-    if (!this.certForm.campos) return;
-    this.certForm.campos.splice(index, 1);
-  }
-
-  carregarDadosUtilizador() {
-    if (this.developmentMode) {
-      this.nome = 'João Santos';
-      this.username = 'joaosantos';
-      this.email = 'joao.santos@exemplo.com';
-      return;
-    }
-
-    this.carteiraService.getUserDataByUsername(this.username).subscribe({
-      next: (userData: UserData) => {
-        this.nome = userData.name;
-        this.username = userData.username;
-        this.email = userData.email;
-      },
-      error: () => {
-        this.nome = 'Utilizador não encontrado';
-        this.mensagemErro = 'Erro ao carregar dados do utilizador.';
-      }
-    });
-  }
-
-  carregarDadosCarteiraPublica() {
-    if (this.developmentMode) {
-      const mockData = {
-        personalData: [
-          { name: 'Profissão'},
-          { name: 'Localização'}
-        ],
-        certificates: [
-          {
-            nome: 'Licenciatura em Engenharia Informática'
-          }
-        ]
-      };
-
-      this.dadosCarteira = this.processarDadosCarteira(mockData);
-    }
-    this.carteiraService.getCarteiraDataByUsername(this.username).subscribe({
-      next: (carteiraData: CarteiraData) => {
-        this.dadosCarteira = this.processarDadosCarteira(carteiraData);
-      },
-      error: (error: any) => {
-        this.mensagemErro = 'Erro ao carregar dados da carteira.';
-      }
-    });
-  }
-
+  /**
+   * Processa os dados brutos da carteira para separar e formatar para a view.
+   */
   private processarDadosCarteira(carteiraData: any): any[] {
     const dados: any[] = [];
 
@@ -276,6 +175,161 @@ export class CarteiraUser implements OnInit {
     return this.dadosCarteira.filter(dado => dado.tipo === 'certificate');
   }
 
+  // ==================================================================================
+  // 2. Pedido de Informação
+  // ==================================================================================
+
+  abrirConfirmacaoPedido(item: any) {
+    this.itemSelecionado = item;
+    this.mensagemPedido = '';
+    this.chavePedido = '';
+    this.mostrarModalConfirmacao = true;
+  }
+
+  fecharConfirmacao() {
+    this.mostrarModalConfirmacao = false;
+    this.itemSelecionado = null;
+    this.mensagemPedido = '';
+    this.chavePedido = '';
+  }
+
+  confirmarPedido() {
+    if (!this.itemSelecionado) return;
+    if (!this.chavePedido || this.chavePedido.trim() === '') {
+      this.mensagemErro = 'É necessário fornecer uma chave para o pedido.';
+      return;
+    }
+    const payload = { item: this.itemSelecionado, mensagem: this.mensagemPedido, chave: this.chavePedido };
+    this.carteiraService.requestInfo(this.username, payload).subscribe({
+      next: (resp) => {
+        this.fecharConfirmacao();
+      },
+      error: (err) => {
+        this.mensagemErro = 'Erro ao enviar pedido de informação.';
+        this.fecharConfirmacao();
+      }
+    });
+  }
+
+  // ==================================================================================
+  // 3. Envio de Certificado 
+  // ==================================================================================
+
+  abrirModalEnviar() {
+    this.mostrarModalEnviarCertificado = true;
+    this.certForm = { nome: '', entidade: this.emissorNome, emissao: this.dataEmissao, campos: [{ chave: '', valor: '' }] };
+  }
+
+  fecharModalEnviar() {
+    this.mostrarModalEnviarCertificado = false;
+    this.certForm = { nome: '', entidade: '', emissao: '', campos: [] };
+  }
+
+  adicionarCampo() {
+    if (!this.certForm.campos) this.certForm.campos = [];
+    this.certForm.campos.push({ chave: '', valor: '' });
+  }
+
+  removerCampo(index: number) {
+    if (!this.certForm.campos) return;
+    this.certForm.campos.splice(index, 1);
+  }
+
+  /**
+   * Constrói o payload JSON para assinatura e download.
+   */
+  prepararPayload() {
+    const camposFiltrados = (this.certForm.campos || []).filter((c: any) => c && c.chave && c.chave.toString().trim() !== '');
+    const payload: any = {
+      nome: this.certForm.nome,
+      entidade: this.emissorNome,
+      emissao: this.dataEmissao,
+      campos: camposFiltrados.map((c: any) => ({ chave: c.chave, valor: c.valor }))
+    };
+    return payload;
+  }
+
+  /**
+   * Gera o ficheiro JSON para o utilizador descarregar e assinar localmente.
+   */
+  gerarJson() {
+    const payload = this.prepararPayload();
+    const jsonStr = JSON.stringify(payload, null, 2);
+    this.lastGeneratedJson = jsonStr;
+
+    // Trigger download
+    const blob = new Blob([jsonStr], { type: 'application/json' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${(this.certForm.nome || 'certificado').replace(/\s+/g, '_')}.json`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    window.URL.revokeObjectURL(url);
+  }
+
+  /**
+   * Processa o ficheiro de assinatura selecionado pelo utilizador.
+   * Lê o ficheiro como ArrayBuffer e converte para Base64.
+   */
+  onSignatureSelected(event: any) {
+    const file = event?.target?.files && event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const arrayBuffer = reader.result as ArrayBuffer;
+        const bytes = new Uint8Array(arrayBuffer);
+        let binary = '';
+        for (let i = 0; i < bytes.byteLength; i++) {
+          binary += String.fromCharCode(bytes[i]);
+        }
+        this.signatureContent = btoa(binary);
+      };
+      reader.readAsArrayBuffer(file);
+    } else {
+      this.signatureContent = null;
+    }
+  }
+
+  /**
+   * Envia o certificado (JSON) e a assinatura para o servidor.
+   */
+  enviarCertificadoComAssinatura() {
+    if (!this.signatureContent) {
+      this.mensagemErro = 'Por favor faça upload da assinatura antes de enviar.';
+      return;
+    }
+
+    const payload = this.prepararPayload();
+    
+    console.log('Sending certificate:', payload, 'Signature:', this.signatureContent);
+
+    this.carteiraService.sendCertificateWithSignature(this.username, payload, this.signatureContent).subscribe({
+      next: (resp) => {
+        this.fecharModalEnviar();
+        this.signatureContent = null;
+      },
+      error: (err) => {
+        this.mensagemErro = 'Erro ao enviar certificado com assinatura.';
+        this.fecharModalEnviar();
+        this.signatureContent = null;
+      }
+    });
+  }
+
+  // ==================================================================================
+  // 4. Helpers e Navegação
+  // ==================================================================================
+
+  getTodayIsoDate(): string {
+    const d = new Date();
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    return `${dd}-${mm}-${yyyy}`;
+  }
+
   public onLogout(): void {
     this.authService.logout().subscribe({
       next: (): void => {
@@ -288,8 +342,6 @@ export class CarteiraUser implements OnInit {
     });
   }
 
-
-  //Pesquisa
   onSearch(query: string) {
     if (!query.trim()) {
       this.searchResults = [];
@@ -304,5 +356,4 @@ export class CarteiraUser implements OnInit {
   goToUserWallet(username: string) {
     this.router.navigate(['/carteira', username]);
   }
-  
 }

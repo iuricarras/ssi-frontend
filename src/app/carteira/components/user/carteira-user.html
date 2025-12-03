@@ -1,3 +1,4 @@
+
 <div class="perfil-container">
   <header class="header">
     <nav class="nav-content">
@@ -11,19 +12,19 @@
       </div>
 
       <div class="search-bar">
-        <mat-icon class="search-icon">search</mat-icon>
-        <input
-          type="text"
-          placeholder="Pesquisar utilizador..."
-          [formControl]="searchControl"
-          [matAutocomplete]="auto"
-        />
-        <mat-autocomplete #auto="matAutocomplete" (optionSelected)="goToUserWallet($event.option.value)">
-          <mat-option *ngFor="let user of searchResults" [value]="user.username">
-            {{ user.username }}
-          </mat-option>
-        </mat-autocomplete>
-      </div>
+      <mat-icon class="search-icon">search</mat-icon>
+      <input
+        type="text"
+        placeholder="Pesquisar utilizador..."
+        [formControl]="searchControl"
+        [matAutocomplete]="auto"
+      />
+      <mat-autocomplete #auto="matAutocomplete" (optionSelected)="goToUserWallet($event.option.value)">
+        <mat-option *ngFor="let user of searchResults" [value]="user.username">
+          {{ user.username }}
+        </mat-option>
+      </mat-autocomplete>
+    </div>
       
       <div class="nav-right">
         <mat-icon class="notification-icon">notifications</mat-icon>
@@ -136,7 +137,7 @@
     </div>
 
     <div class="modal-body">
-      <form (ngSubmit)="enviarCertificado()">
+      <form (ngSubmit)="0">
         <div class="form-group">
           <label for="nomeCertificado">Nome do Certificado</label>
           <input id="nomeCertificado" class="form-input" type="text" [(ngModel)]="certForm.nome" name="nome" required />
@@ -154,9 +155,18 @@
           </div>
         </div>
 
+        <div class="form-group">
+          <label>Passos para Assinatura</label>
+          <p class="info-small">1) Descarregue o ficheiro JSON </p> 
+          <p class="info-small">2) Assine localmente </p>
+          <p class="info-small">3) Faça upload da assinatura </p>
+        </div>
+
         <div class="modal-footer">
           <button class="btn-cancelar" type="button" (click)="fecharModalEnviar()">Cancelar</button>
-          <button class="btn-salvar" type="submit" [disabled]="!certForm.nome.trim() || !certForm.entidade.trim()">Enviar</button>
+          <button class="btn-salvar" type="button" (click)="gerarJson()" [disabled]="!certForm.nome.trim() || !certForm.entidade.trim() || !certForm.emissao.trim()">Descarregar JSON</button>
+          <input class="file-input" type="file" accept=".bin" (change)="onSignatureSelected($event)" />
+          <button class="btn-salvar" type="button" (click)="enviarCertificadoComAssinatura()" [disabled]="!signatureContent">Enviar Assinado</button>
         </div>
       </form>
     </div>

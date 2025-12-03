@@ -10,6 +10,7 @@ import { UserService } from './services/user.service';
 import { Observable } from 'rxjs';
 import { startWith, map } from 'rxjs/operators';
 import { AuthService } from '../../auth/services/auth.service';
+import { CarteiraService } from '../../carteira/services/carteira.services';
 
 @Component({
   selector: 'app-main-page',
@@ -31,13 +32,15 @@ export class MainPage {
 
   searchControl = new FormControl('');
   searchResults: any[] = [];
+  certificadora: boolean = false;
 
   constructor(
     private userService: UserService,
     private router: Router,
+    private carteiraService: CarteiraService,
     private authService: AuthService) {
-    // Atualiza resultados ao digitar
-    this.searchControl.valueChanges.subscribe(value => {
+    this.loadAuthenticated();
+     this.searchControl.valueChanges.subscribe(value => {
       this.onSearch(value || '');
     });
   }
@@ -73,6 +76,18 @@ export class MainPage {
     if (!username) return;
     this.searchControl.setValue('');
     this.router.navigate(['/carteira', username]);
+  }
+
+  loadAuthenticated() {
+    this.carteiraService.getUserData().subscribe({
+      next: (user) => {
+        console.log('User data loaded:', user);
+        this.certificadora = !!(user && user.isEC);
+      },
+      error: () => {
+        this.certificadora = false;
+      }
+    });
   }
  
 }

@@ -46,6 +46,9 @@
 }
 
 .btn-request {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background-color: var(--purple);
   color: var(--text-white);
   padding: 12px 25px;
@@ -195,6 +198,20 @@
 
 .form-group {
   margin-bottom: 20px;
+}
+
+.info-small {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-dark);
+}
+
+.file-input {
+  border: 1px dashed var(--border-light);
+  padding: 8px 12px;
+  border-radius: 6px;
+  background: transparent;
+  cursor: pointer;
 }
 
 .form-group label {

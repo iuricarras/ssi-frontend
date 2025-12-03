@@ -49,10 +49,6 @@ export class Carteira implements OnInit {
   mensagemErroChave: string = '';
   operacaoPendente: (() => void) | null = null;
 
-  developmentMode: boolean = false;
-  testMasterKey: string = '123';
-
-
   searchControl = new FormControl('');
   searchResults: any[] = [];
 

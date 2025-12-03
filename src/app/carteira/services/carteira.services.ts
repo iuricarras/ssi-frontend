@@ -55,11 +55,10 @@ export class CarteiraService {
   }
 
   // enviar certificado assinado
-  sendCertificateWithSignature(username: string, certificate: any, signatureFile: File): Observable<HttpResponse<any>> {
-    const url = `${this.API}/carteira/user/${encodeURIComponent(username)}/certificates`;
-    const form = new FormData();
-    form.append('certificate', JSON.stringify(certificate));
-    form.append('signature', signatureFile, signatureFile.name);
-    return this.http.post<any>(url, form, { observe: 'response', withCredentials: true });
+  sendCertificateWithSignature(username: string, certificate: any, signature: string): Observable<HttpResponse<any>> {
+    return this.http.post<any>(`${this.API}/carteira/user/${encodeURIComponent(username)}/certificates`,
+      { certificate, signature },
+      { observe: 'response', withCredentials: true }
+    );
   }
 }
