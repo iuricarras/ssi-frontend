@@ -68,4 +68,11 @@ export class MainPage {
   selectUser(username: string) {
     this.searchControl.setValue(username);
   }
+
+  goToUserWallet(username: string) {
+    if (!username) return;
+    this.searchControl.setValue('');
+    this.router.navigate(['/carteira', username]);
+  }
+ 
 }
