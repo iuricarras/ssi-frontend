@@ -36,7 +36,7 @@
     } @else {
       <form [formGroup]="codeForm" (ngSubmit)="verifyCode()">
         <mat-form-field appearance="outline">
-          <mat-label>Código de 8 dígitos</mat-label>
+          <mat-label>Código de 6 dígitos</mat-label>
           <input matInput formControlName="code" maxlength="8" />
 
           @if (codeForm.get("code")?.hasError("required")) {
@@ -44,7 +44,7 @@
           }
 
           @if (codeForm.get("code")?.hasError("pattern")) {
-            <mat-error>O código deve conter 8 dígitos.</mat-error>
+            <mat-error>O código deve conter 6 dígitos.</mat-error>
           }
         </mat-form-field>
 

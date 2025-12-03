@@ -5,6 +5,9 @@ import { Router, RouterModule } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { CarteiraService, UserData } from '../../services/carteira.services';
 import { AuthService } from '../../../auth/services/auth.service';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { UserService } from '../../../home/main-page/services/user.service';
 
 @Component({
   selector: 'app-carteira',
@@ -13,7 +16,9 @@ import { AuthService } from '../../../auth/services/auth.service';
     FormsModule,
     CommonModule,
     RouterModule,
-    MatIconModule
+    MatIconModule,
+    ReactiveFormsModule,
+    MatAutocompleteModule
   ],
   templateUrl: './carteira.html',
   styleUrls: ['./carteira.css']
@@ -44,14 +49,26 @@ export class Carteira implements OnInit {
   mensagemErroChave: string = '';
   operacaoPendente: (() => void) | null = null;
 
+  developmentMode: boolean = false;
+  testMasterKey: string = '123';
+
+
+  searchControl = new FormControl('');
+  searchResults: any[] = [];
+
   constructor(
     private router: Router,
     private carteiraService: CarteiraService, 
-    private authService: AuthService
-  ) {}
+    private authService: AuthService,
+    private userService: UserService) {}
   
+
   ngOnInit() {
     this.carregarDadosUtilizador();
+
+    this.searchControl.valueChanges.subscribe(value => {
+      this.onSearch(value || '');
+    });
   }
 
   // --- Carregamento de Dados ---
@@ -266,4 +283,21 @@ export class Carteira implements OnInit {
       }
     });
   }
+
+
+  onSearch(query: string) {
+    if (!query.trim()) {
+      this.searchResults = [];
+      return;
+    }
+
+    this.userService.searchUsers(query).subscribe(res => {
+      this.searchResults = res;
+    });
+  }
+
+  goToUserWallet(username: string) {
+    this.router.navigate(['/carteira', username]);
+  }
+  
 }

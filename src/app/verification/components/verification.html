@@ -1,0 +1,29 @@
+<div class="verification-container">
+
+  <h1>Verificação</h1>
+  <p>ID: {{ verificationId }}</p>
+
+  <div class="master-key-box">
+    <label>Chave Mestra</label>
+    <input type="password" [(ngModel)]="masterKey" placeholder="Insira a chave mestra para desbloquear os dados">
+    <button (click)="getVerification()">
+      Ver Dados
+    </button>
+  </div>
+
+  <div *ngIf="error" class="error">{{ error }}</div>
+
+  <div *ngIf="verificationData" class="result-box">
+    <h2>Dados Verificados</h2>
+    <p><strong>Utilizador verificado:</strong> {{ verificationData.verification_user_id }}</p>
+    <p><strong>Aceite em:</strong> {{ verificationData.accepted_at | date:'short' }}</p>
+
+    <h3>Campos solicitados:</h3>
+    <ul>
+      <li *ngFor="let campo of verificationData.verification_data">
+        <strong>{{ campo.chave || campo.name }}:</strong> {{ campo.valor }}
+      </li>
+    </ul>
+  </div>
+
+</div>

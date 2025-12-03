@@ -12,7 +12,17 @@
 
       <div class="search-bar">
         <mat-icon class="search-icon">search</mat-icon>
-        <input type="text" placeholder="Pesquisar...">
+        <input
+          type="text"
+          placeholder="Pesquisar utilizador..."
+          [formControl]="searchControl"
+          [matAutocomplete]="auto"
+        />
+        <mat-autocomplete #auto="matAutocomplete" (optionSelected)="goToUserWallet($event.option.value)">
+          <mat-option *ngFor="let user of searchResults" [value]="user.username">
+            {{ user.username }}
+          </mat-option>
+        </mat-autocomplete>
       </div>
       
       <div class="nav-right">

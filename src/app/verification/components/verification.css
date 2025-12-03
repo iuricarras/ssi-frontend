@@ -1,0 +1,44 @@
+.verification-container {
+  padding: 20px;
+}
+
+.master-key-box {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.master-key-box input {
+  padding: 10px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+}
+
+.master-key-box button {
+  padding: 10px;
+  background: #5e17eb;  
+  border: none;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.2s;
+}
+
+.master-key-box button:hover {
+  background: #7f3ffb;  
+}
+
+.error {
+  margin-top: 10px;
+  color: red;
+}
+
+.result-box {
+  margin-top: 20px;
+  padding: 15px;
+  background: #f0f0f0;
+  border-radius: 6px;
+}
