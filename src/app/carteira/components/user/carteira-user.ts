@@ -1,10 +1,12 @@
 import { Component, OnInit } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, FormControl } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { CarteiraService, UserData, CarteiraData } from '../../services/carteira.services';
 import { AuthService } from '../../../auth/services/auth.service';
+import { UserService } from '../../../home/main-page/services/user.service';
 
 @Component({
   selector: 'app-carteira-user',
@@ -13,6 +15,8 @@ import { AuthService } from '../../../auth/services/auth.service';
     FormsModule,
     CommonModule,
     RouterModule,
+    ReactiveFormsModule,
+    MatAutocompleteModule,
     MatIconModule
   ],
   templateUrl: './carteira-user.html',
@@ -46,11 +50,16 @@ export class CarteiraUser implements OnInit {
   };
   emissorNome: string = '';
 
+  // Pesquisa
+  searchControl = new FormControl('');
+  searchResults: any[] = [];
+
   constructor(
     private router: Router,
     private authService: AuthService,
     private carteiraService: CarteiraService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private userService: UserService
   ) {}
 
   ngOnInit() {
@@ -62,6 +71,9 @@ export class CarteiraUser implements OnInit {
     });
     // obter info do utilizador autenticado
     this.loadAuthenticatedName();
+
+    // Pesquisa
+    this.searchControl.valueChanges.subscribe(value => this.onSearch(value || ''));
   }
 
   // Abre modal de confirmação para pedir informação
@@ -275,4 +287,22 @@ export class CarteiraUser implements OnInit {
       }
     });
   }
+
+
+  //Pesquisa
+  onSearch(query: string) {
+    if (!query.trim()) {
+      this.searchResults = [];
+      return;
+    }
+
+    this.userService.searchUsers(query).subscribe(res => {
+      this.searchResults = res;
+    });
+  }
+
+  goToUserWallet(username: string) {
+    this.router.navigate(['/carteira', username]);
+  }
+  
 }
