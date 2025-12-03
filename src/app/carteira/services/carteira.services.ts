@@ -1,17 +1,16 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpResponse } from "@angular/common/http";
+import { HttpClient, HttpResponse, HttpHeaders } from "@angular/common/http";
 import { Observable } from 'rxjs';
 
 export interface UserData {
   id: string;
-  name: string;
-  username: string;
-  email: string;
-  nif?: string;
+  nome: string;
+  username?: string | "";
+  email?: string | "";
+  isEC?: boolean | false;
 }
 
 export interface CarteiraData {
-  user: UserData;
   certificates: any[];
   personalData: any;
 }
@@ -26,22 +25,14 @@ export class CarteiraService {
 
   // para utilizador autenticado
   getUserData(): Observable<UserData> {
-    return this.http.get<UserData>(`${this.API}/user/profile`, { withCredentials: true });
+    return this.http.get<UserData>(`${this.API}/auth/me`, { withCredentials: true });
   }
-  getCarteiraData(): Observable<CarteiraData> {
-    return this.http.get<CarteiraData>(`${this.API}/carteira`, { withCredentials: true });
+  getCarteiraData(masterKey: string): Observable<CarteiraData> {
+    return this.http.post<CarteiraData>(`${this.API}/carteira/`, { masterKey }, { withCredentials: true });
   }
-
-  // operações da carteira pessoal
-  verifyMasterKey(masterKey: string): Observable<HttpResponse<any>> {
-    return this.http.post<any>(`${this.API}/carteira/verify-key`, 
-      { masterKey }, 
-      { observe: "response", withCredentials: true }
-    );
-  }
-  updateCarteiraData(carteiraData: any): Observable<HttpResponse<any>> {
+  updateCarteiraData(carteiraData: any, masterKey: string): Observable<HttpResponse<any>> {
     return this.http.put<any>(`${this.API}/carteira/update`, 
-      carteiraData, 
+      { data: carteiraData, masterKey: masterKey }, 
       { observe: "response", withCredentials: true }
     );
   }
@@ -55,13 +46,7 @@ export class CarteiraService {
     return this.http.get<CarteiraData>(`${this.API}/carteira/user/${encodeURIComponent(username)}`, { withCredentials: true });
   }
 
-  // enviar pedidos e certificados
-  sendCertificate(username: string, certificate: any): Observable<HttpResponse<any>> {
-    return this.http.post<any>(`${this.API}/carteira/user/${encodeURIComponent(username)}/certificates`,
-      certificate,
-      { observe: 'response', withCredentials: true }
-    );
-  }
+  // pedir informações  ao utilizador
   requestInfo(username: string, payload: { item: any; mensagem?: string }): Observable<HttpResponse<any>> {
     return this.http.post<any>(`${this.API}/carteira/user/${encodeURIComponent(username)}/request-info`,
       payload,
@@ -69,8 +54,12 @@ export class CarteiraService {
     );
   }
 
-
-
-
-
+  // enviar certificado assinado
+  sendCertificateWithSignature(username: string, certificate: any, signatureFile: File): Observable<HttpResponse<any>> {
+    const url = `${this.API}/carteira/user/${encodeURIComponent(username)}/certificates`;
+    const form = new FormData();
+    form.append('certificate', JSON.stringify(certificate));
+    form.append('signature', signatureFile, signatureFile.name);
+    return this.http.post<any>(url, form, { observe: 'response', withCredentials: true });
+  }
 }

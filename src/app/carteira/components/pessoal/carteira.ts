@@ -18,57 +18,51 @@ import { AuthService } from '../../../auth/services/auth.service';
   templateUrl: './carteira.html',
   styleUrls: ['./carteira.css']
 })
-
 export class Carteira implements OnInit {
+  
+  // --- Estado da Interface ---
   input: string = '';
   dadosAcessiveis: boolean = false;
   mensagemErro: string = '';
   
-  // Dados do utilizador
+  // --- Dados do Utilizador e Carteira ---
   nome: string = '';
   username: string = "";
   email: string = '';
   dadosCarteira: any[] = [];
 
-  // Modal de edição/adição
+  // --- Modal de Edição/Adição ---
   mostrarModal: boolean = false;
   modoEdicao: boolean = false; // true para editar, false para adicionar
   dadoEdicao: any = { chave: '', valor: '' };
   novoNome: string = '';
   novoValor: string = '';
 
-  // Modal de confirmação com chave mestra
+  // --- Modal de Confirmação (Chave Mestra) ---
   mostrarModalChaveMestra: boolean = false;
   chaveMestraInput: string = '';
   mensagemErroChave: string = '';
   operacaoPendente: (() => void) | null = null;
 
-  developmentMode: boolean = false;
-  testMasterKey: string = '123';
-
   constructor(
     private router: Router,
     private carteiraService: CarteiraService, 
-    private authService: AuthService) {}
+    private authService: AuthService
+  ) {}
   
-
   ngOnInit() {
     this.carregarDadosUtilizador();
   }
 
+  // --- Carregamento de Dados ---
+
+  /** Carrega as informações básicas do perfil do utilizador. */
   carregarDadosUtilizador() {
-    if (this.developmentMode) {
-      this.nome = 'Ana Silva';
-      this.username = 'anasilva'
-      this.email = 'ana.silva@exemplo.com';
-      return;
-    } 
-    
     this.carteiraService.getUserData().subscribe({
       next: (userData: UserData) => {
-        this.nome = userData.name;
-        this.username = userData.username;
-        this.email = userData.email;
+        this.nome = userData.nome;
+        this.username = userData?.username || "";
+        this.email = userData?.email || "";
       },
       error: () => {
         this.nome = 'Erro ao carregar os dados do Utilizador';
@@ -76,6 +70,7 @@ export class Carteira implements OnInit {
     });
   } 
 
+  /** Valida a chave mestra inserida e carrega os dados decifrados da carteira. */
   validarChaveMestra() {
     this.mensagemErro = '';
     
@@ -83,93 +78,23 @@ export class Carteira implements OnInit {
       this.mensagemErro = 'Por favor, insira a chave mestra.';
       return;
     }
-    
-    if (this.developmentMode) {
-      if (this.input === this.testMasterKey) {
-        this.carregarDadosCarteira();
-        this.mensagemErro = '';
-      } else {
-        this.dadosAcessiveis = false;
-        this.mensagemErro = `Chave incorreta.`;
-      }
-      this.input = '';
-      return;
-    }
-    
-    this.carteiraService.verifyMasterKey(this.input).subscribe({
-      next: (response) => {
-        if (response.status === 200) {
-          this.carregarDadosCarteira();
-          this.mensagemErro = '';
-        } else {
-          this.dadosAcessiveis = false;
-          this.mensagemErro = 'Chave Mestra incorreta. Tente novamente.';
-        }
-        this.input = '';
-        return;
-      },
-      error: (error) => {
-        this.dadosAcessiveis = false;
-        
-        if (error.status === 401 || error.status === 403) {
-          this.mensagemErro = 'Chave Mestra incorreta. Tente novamente.';
-        } else {
-          this.mensagemErro = 'Erro interno do servidor. Tente novamente mais tarde.';
-        }
-        this.input = '';
-      }
-    });
-  }
 
-  carregarDadosCarteira() {
-    if (this.developmentMode) {
-      this.dadosAcessiveis = true;
-      const mockData = {
-        personalData: [
-          {name: 'Data de Nascimento',
-            value: '11/12/2004'
-          },
-          {name: 'Telemóvel',
-            value: '+351 927 087 206'
-          }],
-        certificates: [
-          {
-            nome: 'Habilitação Académica',
-            curso: 'Licenciatura em Engenharia Informática',
-            entidade: 'Universidade da Beira Interior',
-            emissão: '15/07/2025',
-            nota: '17 valores'
-          },
-          {
-            nome: 'Carta de Condução',
-            categoria: 'Categoria B',
-            entidade: 'IMT - Instituto da Mobilidade e dos Transportes',
-            emissão: '25/01/2024',
-            expira: '25/01/2039'
-          }
-        ]
-      };
-      
-      this.dadosCarteira = this.processarDadosCarteira(mockData);
-      return;
-    }
-
-    this.carteiraService.getCarteiraData().subscribe({
+    this.carteiraService.getCarteiraData(this.input).subscribe({
       next: (carteiraData) => {
         this.dadosAcessiveis = true;
-        this.dadosCarteira = this.processarDadosCarteira(carteiraData);
+        this.dadosCarteira = this.processarDadosCarteira(carteiraData)
       },
       error: (error) => {
-        this.dadosAcessiveis = false;
-        this.mensagemErro = 'Erro ao carregar dados da carteira. Tente novamente.';
+        this.mensagemErro = 'Chave Mestra inválida.';
       }
     });
   }
 
+  /** Transforma a estrutura de dados recebida do backend numa lista. */
   private processarDadosCarteira(carteiraData: any): any[] {
     const dados: any[] = [];
 
-    // pessoais
+    // Processar dados pessoais
     if (carteiraData.personalData && Array.isArray(carteiraData.personalData)) {
       carteiraData.personalData.forEach((item: any) => {
         if (item.name && item.value && item.value !== null && item.value !== '') {
@@ -183,7 +108,7 @@ export class Carteira implements OnInit {
       });
     }
 
-    // certificados 
+    // Processar certificados
     if (carteiraData.certificates && Array.isArray(carteiraData.certificates)) {
       carteiraData.certificates.forEach((cert: any, index: number) => {
         const certificadoAgrupado: any = {
@@ -192,6 +117,7 @@ export class Carteira implements OnInit {
           campos: []
         };
 
+        // tratar cada campo do certificado
         Object.keys(cert).forEach(key => {
           const value = cert[key];
           if (key != 'nome' && value && value !== null && value !== '') {
@@ -211,6 +137,8 @@ export class Carteira implements OnInit {
     return dados;
   }
   
+  // --- Getters para o Template ---
+
   getDadosPessoais(): any[] {
     return this.dadosCarteira.filter(dado => dado.tipo === 'personalData');
   }
@@ -219,16 +147,12 @@ export class Carteira implements OnInit {
     return this.dadosCarteira.filter(dado => dado.tipo === 'certificate');
   }
 
+  // --- Gestão de Operações ---
 
-// Adicionar, Eliminar e Editar Dados
-
+  /** Agenda uma operação sensível para ser executada após confirmação da chave mestra. */
   private scheduleOperation(operation: () => void) {
     this.operacaoPendente = operation;
     this.mostrarModalChaveMestra = true;
-  }
-  private finalizeChange() {
-    this.fecharModal();
-    this.enviarAtualizacaoParaServidor();
   }
 
   adicionarInformacao() {
@@ -238,6 +162,7 @@ export class Carteira implements OnInit {
     this.novoValor = '';
     this.mostrarModal = true;
   }
+
   editarDadoPessoal(dado: any) {
     this.modoEdicao = true;
     this.dadoEdicao = { ...dado };
@@ -246,23 +171,28 @@ export class Carteira implements OnInit {
     this.mostrarModal = true;
   }
 
+  /** Prepara os dados editados/novos e agenda o envio para o servidor. */
   salvarEdicao() {
     if (!this.novoNome.trim() || !this.novoValor.trim()) return;
 
     this.scheduleOperation(() => {
+      const novosDados = this.dadosCarteira.map(d => ({ ...d }));
+      
       if (this.modoEdicao) {
-        const idx = this.dadosCarteira.findIndex(i => i.tipo === 'personalData' && i.chave === this.dadoEdicao.chave);
+        const idx = novosDados.findIndex(i => i.tipo === 'personalData' && i.chave === this.dadoEdicao.chave);
         if (idx > -1) {
-          this.dadosCarteira[idx].chave = this.novoNome.trim();
-          this.dadosCarteira[idx].valor = this.novoValor.trim();
+          novosDados[idx].chave = this.novoNome.trim();
+          novosDados[idx].valor = this.novoValor.trim();
         }
       } else {
-        this.dadosCarteira.push({ tipo: 'personalData', chave: this.novoNome.trim(), valor: this.novoValor.trim(), isCertificate: false });
+        novosDados.push({ tipo: 'personalData', chave: this.novoNome.trim(), valor: this.novoValor.trim(), isCertificate: false });
       }
 
-      this.finalizeChange();
+      this.enviarAtualizacaoParaServidor(novosDados, this.chaveMestraInput);
+      this.fecharModal();
     });
   }
+
   fecharModal() {
     this.mostrarModal = false;
     this.modoEdicao = false;
@@ -273,41 +203,26 @@ export class Carteira implements OnInit {
 
   eliminarDadoPessoal(dado: any) {
     this.scheduleOperation(() => {
-      this.dadosCarteira = this.dadosCarteira.filter(item => !(item.tipo === 'personalData' && item.chave === dado.chave));
-      this.finalizeChange();
+      const novosDados = this.dadosCarteira.filter(item => !(item.tipo === 'personalData' && item.chave === dado.chave));
+      this.enviarAtualizacaoParaServidor(novosDados, this.chaveMestraInput);
     });
   }
+
   eliminarCertificado(certificado: any) {
     this.scheduleOperation(() => {
-      this.dadosCarteira = this.dadosCarteira.filter(item => !(item.tipo === 'certificate' && item.nome === certificado.nome));
-      this.finalizeChange();
+      const novosDados = this.dadosCarteira.filter(item => !(item.tipo === 'certificate' && item.nome === certificado.nome));
+      this.enviarAtualizacaoParaServidor(novosDados, this.chaveMestraInput);
     });
   }
+
+  // --- Confirmação de Chave Mestra ---
 
   confirmarChaveMestra() {
     if (!this.chaveMestraInput.trim()) {
       this.mensagemErroChave = 'Por favor, insira a chave mestra.';
       return;
     }
-
-    if (this.developmentMode) {
-      if (this.chaveMestraInput === this.testMasterKey) {
-        this.executarOperacaoPendente();
-      } else {
-        this.mensagemErroChave = 'Chave mestra incorreta.';
-      }
-      return;
-    }
-
-    this.carteiraService.verifyMasterKey(this.chaveMestraInput).subscribe({
-      next: (response) => {
-        if (response.status === 200) this.executarOperacaoPendente();
-        else this.mensagemErroChave = 'Chave mestra incorreta.';
-      },
-      error: (error) => {
-        this.mensagemErroChave = (error.status === 401 || error.status === 403) ? 'Chave mestra incorreta.' : 'Erro de conexão. Tente novamente.';
-      }
-    });
+    this.executarOperacaoPendente();
   }
 
   executarOperacaoPendente() {
@@ -317,6 +232,7 @@ export class Carteira implements OnInit {
     op();
     this.fecharModalChaveMestra();
   }
+
   fecharModalChaveMestra() {
     this.mostrarModalChaveMestra = false;
     this.chaveMestraInput = '';
@@ -324,19 +240,21 @@ export class Carteira implements OnInit {
     this.operacaoPendente = null;
   }
 
-  enviarAtualizacaoParaServidor() {
-    if (this.developmentMode) return;
-  
-    this.carteiraService.updateCarteiraData(this.dadosCarteira).subscribe({
+  // --- Comunicação com Servidor ---
+
+  enviarAtualizacaoParaServidor(dados: any[], masterKey: string) {
+    this.carteiraService.updateCarteiraData(dados, masterKey).subscribe({
       next: () => {
-        console.log('Carteira atualizada com sucesso');
+        this.dadosCarteira = dados;
       },
       error: (error) => {
-        console.error('Erro ao atualizar carteira', error);
-        alert('Erro ao salvar alterações. Tente novamente.');
+        alert('Erro ao guardar as alterações. Tente novamente.');
       }
     });
   }
+
+  // --- Autenticação ---
+
   public onLogout(): void {
     this.authService.logout().subscribe({
       next: (): void => {
