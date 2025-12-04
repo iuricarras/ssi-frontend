@@ -25,7 +25,7 @@
     </div>
 
     <div class="nav-right">
-      <mat-icon class="notification-icon">notifications</mat-icon>
+      <mat-icon class="notification-icon" routerLink="/notifications">notifications</mat-icon>
 
       <button mat-button *ngIf="!certificadora" routerLink="/carteira">CARTEIRA</button>
       <button mat-button (click)="onLogout()">LOG OUT</button>
@@ -46,4 +46,3 @@
   </h1>
 
 </div>
-

@@ -1,4 +1,3 @@
-
 <div class="perfil-container">
   <header class="header">
     <nav class="nav-content">
@@ -27,7 +26,8 @@
       </div>
       
       <div class="nav-right">
-        <mat-icon class="notification-icon">notifications</mat-icon>
+        <!-- Botão de Notificações agora aponta para a rota -->
+        <mat-icon class="notification-icon" routerLink="/notifications">notifications</mat-icon>
         <button mat-button routerLink="/home/main-page">HOME</button>
         <button mat-button (click)="onLogout()">LOG OUT</button>
       </div>

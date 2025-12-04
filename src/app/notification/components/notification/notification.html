@@ -1,0 +1,142 @@
+<div class="notifications-container">
+    <header class="header">
+        <nav class="nav-content">
+            
+            <div class="nav-left">
+                <div class="logo">
+                    <a routerLink="/home/main-page">
+                        <img src="logo.png" alt="Logo" class="logo-image">
+                    </a>
+                </div>
+            </div>
+            
+            <div class="nav-right">
+                <button mat-button routerLink="/home/main-page">HOME</button>
+                <button mat-button (click)="onLogout()">LOG OUT</button>
+            </div>
+    
+        </nav>
+    </header>
+
+    <div class="conteudo-notificacoes">
+        <h1>Notificações Pendentes</h1>
+        <p class="sub-header">Reveja e responda às requisições submetidas à sua carteira.</p>
+
+        <div *ngIf="isLoading" class="loading-state">
+            <mat-icon class="spinner">autorenew</mat-icon>
+            <p>A carregar notificações...</p>
+        </div>
+
+        <div *ngIf="errorMessage" class="feedback error-message">
+            <mat-icon>error</mat-icon> {{ errorMessage }}
+        </div>
+        
+        <div *ngIf="successMessage" class="feedback success-message">
+            <mat-icon>check_circle</mat-icon> {{ successMessage }}
+        </div>
+
+        <div class="notification-list" *ngIf="!isLoading && notifications.length > 0">
+            <div *ngFor="let notif of notifications" class="notification-item">
+                <div class="notif-content">
+                    <mat-icon class="notif-icon">info</mat-icon>
+                    <div class="notif-text">
+                        <h3>{{ getNotificationTitle(notif) }}</h3>
+                        <p class="requester">
+                            Requerente: <strong>{{ notif.requester_name }}</strong> ({{ notif.requester_id }})
+                        </p>
+                        <p class="timestamp">
+                            Data: {{ notif.created_at | date:'medium' }}
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="notif-actions">
+                    <button class="btn-accept" (click)="openAcceptModal(notif)">
+                        <mat-icon>check</mat-icon> Aceitar
+                    </button>
+                    <button class="btn-reject" (click)="handleReject(notif)">
+                        <mat-icon>close</mat-icon> Rejeitar
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div *ngIf="!isLoading && notifications.length === 0" class="empty-state">
+            <mat-icon>notifications_none</mat-icon>
+            <p>Não tem notificações pendentes.</p>
+        </div>
+
+    </div>
+</div>
+
+
+<div *ngIf="isModalOpen" class="modal-overlay" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <h3>Aceitar Requisição</h3>
+            <button class="modal-close" (click)="closeModal()">
+                <mat-icon>close</mat-icon>
+            </button>
+        </div>
+        
+        <div class="modal-body">
+            <p *ngIf="selectedNotification?.type === 'CERTIFICATE_ADDITION'">
+                Confirma que pretende **aceitar** esta requisição de adição de certificado?
+            </p>
+             <p *ngIf="selectedNotification?.type === 'VERIFICATION_REQUEST'">
+                Confirma que pretende **aceitar** que a entidade requerente aceda aos dados solicitados para verificação?
+            </p>
+            
+            <div *ngIf="selectedNotification?.type === 'CERTIFICATE_ADDITION'" class="master-key-section">
+                <p class="warning-text">
+                    <mat-icon>vpn_key</mat-icon>
+                    Para adicionar um certificado à sua carteira, é necessário cifrá-lo com a sua Chave Mestra.
+                </p>
+                
+                <div class="form-group">
+                    <label for="masterKeyInput">Chave Mestra:</label>
+                    <input
+                        id="masterKeyInput"
+                        type="password"
+                        [(ngModel)]="masterKey"
+                        placeholder="Insira a sua chave mestra"
+                        class="form-input"
+                    />
+                </div>
+            </div>
+            
+            <!-- A chave mestra também seria necessária para aceitar a verificação, se o backend o exigir. 
+            No backend atual, a chave mestra é passada no corpo do request para aceitar a verificação.
+            Portanto, para VERIFICATION_REQUEST, também precisamos da chave mestra. -->
+            <div *ngIf="selectedNotification?.type === 'VERIFICATION_REQUEST'" class="master-key-section">
+                <p class="warning-text">
+                    <mat-icon>vpn_key</mat-icon>
+                    Para permitir a verificação, é necessário decifrar temporariamente os dados com a sua Chave Mestra.
+                </p>
+                
+                <div class="form-group">
+                    <label for="masterKeyInputVerification">Chave Mestra:</label>
+                    <input
+                        id="masterKeyInputVerification"
+                        type="password"
+                        [(ngModel)]="masterKey"
+                        placeholder="Insira a sua chave mestra"
+                        class="form-input"
+                    />
+                </div>
+            </div>
+
+            <div *ngIf="modalErrorMessage" class="feedback error-message-modal">
+                <mat-icon>error</mat-icon> {{ modalErrorMessage }}
+            </div>
+        </div>
+        
+        <div class="modal-footer">
+            <button class="btn-cancelar" (click)="closeModal()">Cancelar</button>
+            <button class="btn-confirmar" (click)="handleAccept()" [disabled]="isLoading || (!masterKey.trim() && (selectedNotification?.type === 'CERTIFICATE_ADDITION' || selectedNotification?.type === 'VERIFICATION_REQUEST'))">
+                <span *ngIf="!isLoading">Confirmar Aceitação</span>
+                <span *ngIf="isLoading"><mat-icon class="spinner">autorenew</mat-icon> A processar...</span>
+            </button>
+        </div>
+    </div>
+</div>
