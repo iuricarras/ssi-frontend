@@ -3,7 +3,7 @@ import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
-import { CarteiraService, UserData, CarteiraData } from '../../services/carteira.services';
+import { CarteiraService, UserData, CarteiraData, VerificationRequestPayload } from '../../services/carteira.services'; 
 import { AuthService } from '../../../auth/services/auth.service';
 import { UserService } from '../../../home/main-page/services/user.service';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
@@ -42,7 +42,7 @@ export class CarteiraUser implements OnInit {
   mostrarModalConfirmacao: boolean = false;
   itemSelecionado: any = null;
   mensagemPedido: string = '';
-  chavePedido: string = '';
+  chavePedido: string = ''; // Chave mestra do EC (requerente) para cifrar o segredo.
 
   // --- Modals: Envio de Certificado ---
   mostrarModalEnviarCertificado: boolean = false;
@@ -176,7 +176,7 @@ export class CarteiraUser implements OnInit {
   }
 
   // ==================================================================================
-  // 2. Pedido de Informação
+  // 2. Pedido de Informação (Requisição de Verificação)
   // ==================================================================================
 
   abrirConfirmacaoPedido(item: any) {
@@ -199,20 +199,30 @@ export class CarteiraUser implements OnInit {
       this.mensagemErro = 'É necessário fornecer uma chave para o pedido.';
       return;
     }
-    const payload = { item: this.itemSelecionado, mensagem: this.mensagemPedido, chave: this.chavePedido };
-    this.carteiraService.requestInfo(this.username, payload).subscribe({
+
+    const verificationDataType = this.itemSelecionado.chave || this.itemSelecionado.nome;
+    
+    // Payload adaptado para o endpoint /verify/request-verification
+    const payload: VerificationRequestPayload = { 
+      masterKey: this.chavePedido, 
+      verificationUser: this.username, 
+      verificationDataType: verificationDataType 
+    };
+    
+    this.carteiraService.requestVerification(payload).subscribe({
       next: (resp) => {
+        alert('Pedido de informação submetido com sucesso! O utilizador receberá uma notificação.');
         this.fecharConfirmacao();
       },
       error: (err) => {
-        this.mensagemErro = 'Erro ao enviar pedido de informação.';
+        alert(`Erro ao enviar pedido de informação: ${err.error?.error || 'Erro desconhecido'}`);
         this.fecharConfirmacao();
       }
     });
   }
 
   // ==================================================================================
-  // 3. Envio de Certificado 
+  // 3. Envio de Certificado (Requisição de Adição de Certificado)
   // ==================================================================================
 
   abrirModalEnviar() {
@@ -223,6 +233,7 @@ export class CarteiraUser implements OnInit {
   fecharModalEnviar() {
     this.mostrarModalEnviarCertificado = false;
     this.certForm = { nome: '', entidade: '', emissao: '', campos: [] };
+    this.signatureContent = null;
   }
 
   adicionarCampo() {
@@ -237,16 +248,23 @@ export class CarteiraUser implements OnInit {
 
   /**
    * Constrói o payload JSON para assinatura e download.
+   * NOTE: O backend espera os dados do certificado no formato de mapa (chave: valor).
    */
-  prepararPayload() {
-    const camposFiltrados = (this.certForm.campos || []).filter((c: any) => c && c.chave && c.chave.toString().trim() !== '');
-    const payload: any = {
+  prepararPayload(): any {
+    const certificateData: any = {
       nome: this.certForm.nome,
       entidade: this.emissorNome,
       emissao: this.dataEmissao,
-      campos: camposFiltrados.map((c: any) => ({ chave: c.chave, valor: c.valor }))
     };
-    return payload;
+
+    (this.certForm.campos || []).forEach((c: any) => {
+      if (c && c.chave && c.chave.toString().trim() !== '') {
+        // Assume que a chave do campo será a chave no objeto final
+        certificateData[c.chave] = c.valor; 
+      }
+    });
+
+    return certificateData;
   }
 
   /**
@@ -254,7 +272,8 @@ export class CarteiraUser implements OnInit {
    */
   gerarJson() {
     const payload = this.prepararPayload();
-    const jsonStr = JSON.stringify(payload, null, 2);
+    // Para download e assinatura, queremos o JSON completo com todos os campos
+    const jsonStr = JSON.stringify(payload, null, 2); 
     this.lastGeneratedJson = jsonStr;
 
     // Trigger download
@@ -297,21 +316,33 @@ export class CarteiraUser implements OnInit {
    */
   enviarCertificadoComAssinatura() {
     if (!this.signatureContent) {
-      this.mensagemErro = 'Por favor faça upload da assinatura antes de enviar.';
+      alert('Por favor faça upload da assinatura antes de enviar.');
       return;
     }
-
-    const payload = this.prepararPayload();
+    if (!this.certForm.nome.trim()) {
+        alert('O nome do certificado é obrigatório.');
+        return;
+    }
     
-    console.log('Sending certificate:', payload, 'Signature:', this.signatureContent);
-
-    this.carteiraService.sendCertificateWithSignature(this.username, payload, this.signatureContent).subscribe({
+    // 1. Prepara os dados base do certificado
+    const certificateData = this.prepararPayload();
+    
+    // 2. Adiciona a assinatura da EC ao objeto de dados do certificado, pois o backend
+    // espera a assinatura DENTRO de `certificate_data` para verificação.
+    certificateData.signature = this.signatureContent; 
+    
+    // 3. Usa o novo método do serviço que aponta para /notifications/request-certificate
+    this.carteiraService.sendCertificateAddition(
+      this.email, // O email do utilizador alvo
+      certificateData
+    ).subscribe({
       next: (resp) => {
+        alert('Requisição de Certificado submetida com sucesso! O utilizador será notificado.');
         this.fecharModalEnviar();
         this.signatureContent = null;
       },
       error: (err) => {
-        this.mensagemErro = 'Erro ao enviar certificado com assinatura.';
+        alert(`Erro ao submeter requisição de certificado: ${err.error?.error || 'Erro desconhecido'}`);
         this.fecharModalEnviar();
         this.signatureContent = null;
       }

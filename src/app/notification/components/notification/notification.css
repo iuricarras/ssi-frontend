@@ -1,0 +1,318 @@
+:host {
+    display: block;
+    background-color: var(--background);
+    min-height: 100vh;
+    font-size: 16px;
+}
+.notifications-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.conteudo-notificacoes {
+    flex-grow: 1;
+    padding: 40px 20px;
+    max-width: 900px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+h1 {
+    font-size: 2.5rem;
+    color: var(--purple);
+    margin-bottom: 10px;
+}
+
+.sub-header {
+    font-size: 1.1rem;
+    color: #666;
+    margin-bottom: 30px;
+}
+
+.loading-state, .empty-state {
+    text-align: center;
+    padding: 50px 20px;
+    background-color: var(--background-white);
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    margin-top: 20px;
+}
+.loading-state mat-icon, .empty-state mat-icon {
+    font-size: 50px;
+    width: 50px;
+    height: 50px;
+    color: var(--purple);
+    margin-bottom: 15px;
+}
+.loading-state .spinner {
+    animation: spin 1.5s linear infinite;
+}
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.feedback {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    font-weight: 600;
+}
+.feedback mat-icon {
+    margin-right: 10px;
+}
+.error-message {
+    background-color: #fce4e4; 
+    color: var(--error);
+    border: 1px solid #c62828;
+}
+.success-message {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+    border: 1px solid #4caf50;
+}
+.error-message-modal {
+    margin-top: 15px;
+}
+
+.notification-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.notification-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--background-white);
+    padding: 20px 25px;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    border-left: 5px solid var(--purple);
+    transition: all 0.3s ease;
+}
+
+.notification-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+}
+
+.notif-content {
+    display: flex;
+    align-items: center;
+    flex: 1;
+}
+
+.notif-icon {
+    font-size: 30px;
+    width: 30px;
+    height: 30px;
+    margin-right: 20px;
+    color: var(--purple);
+}
+
+.notif-text h3 {
+    margin: 0 0 5px 0;
+    font-size: 1.2rem;
+    color: var(--text-dark);
+}
+
+.notif-text p {
+    margin: 0;
+    font-size: 0.95rem;
+    color: #555;
+}
+
+.requester strong {
+    font-weight: 700;
+    color: var(--purple);
+}
+
+.notif-actions {
+    display: flex;
+    gap: 15px;
+    flex-shrink: 0;
+}
+
+.btn-accept, .btn-reject {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 30px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.2s ease;
+}
+
+.btn-accept {
+    background-color: #4CAF50; /* Green */
+    color: var(--text-white);
+}
+
+.btn-reject {
+    background-color: var(--error); /* Red */
+    color: var(--text-white);
+}
+
+.btn-accept:hover {
+    background-color: #66BB6A;
+    transform: translateY(-1px);
+}
+
+.btn-reject:hover {
+    background-color: #EF5350;
+    transform: translateY(-1px);
+}
+
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    backdrop-filter: blur(4px);
+}
+
+.modal-content {
+    background: var(--background-white);
+    border-radius: 12px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    width: 90%;
+    max-width: 450px;
+    animation: modalAppear 0.3s ease-out;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border-light);
+    background-color: var(--purple);
+    color: var(--text-white);
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    color: var(--text-white);
+    cursor: pointer;
+    padding: 4px;
+}
+
+.modal-body {
+    padding: 24px;
+}
+
+.master-key-section {
+    margin-top: 20px;
+    padding: 15px;
+    border: 1px solid var(--light-purple);
+    border-radius: 8px;
+    background-color: #f7f3ff;
+}
+
+.warning-text {
+    font-size: 0.9rem;
+    color: var(--purple);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 15px !important;
+}
+.warning-text mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: var(--text-dark);
+    font-size: 0.95rem;
+}
+
+.form-input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid var(--border-light);
+    border-radius: 8px;
+    font-size: 1rem;
+    box-sizing: border-box;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 20px 24px;
+    background-color: var(--background);
+    border-top: 1px solid var(--border-light);
+}
+
+.btn-cancelar {
+    background-color: var(--background-white);
+    color: var(--purple);
+    border: 2px solid var(--purple);
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.24s ease;
+}
+
+.btn-confirmar {
+    background-color: #4CAF50;
+    color: var(--text-white);
+    border: 2px solid #4CAF50;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.24s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-confirmar:disabled {
+    background-color: #A5D6A7 !important;
+    border-color: #A5D6A7 !important;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+@media (max-width: 768px) {
+    .notification-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .notif-actions {
+        margin-top: 15px;
+        width: 100%;
+        justify-content: space-between;
+    }
+    .btn-accept, .btn-reject {
+        flex: 1;
+        justify-content: center;
+    }
+}
