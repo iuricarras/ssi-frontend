@@ -164,7 +164,7 @@
 
         <div class="modal-footer">
           <button class="btn-cancelar" type="button" (click)="fecharModalEnviar()">Cancelar</button>
-          <button class="btn-salvar" type="button" (click)="gerarJson()" [disabled]="!certForm.nome.trim() || !certForm.entidade.trim() || !certForm.emissao.trim()">Descarregar JSON</button>
+          <button class="btn-salvar" type="button" (click)="gerarJson()" [disabled]="!certForm.nome.trim()">Descarregar JSON</button>
           <input class="file-input" type="file" accept=".bin" (change)="onSignatureSelected($event)" />
           <button class="btn-salvar" type="button" (click)="enviarCertificadoComAssinatura()" [disabled]="!signatureContent">Enviar Assinado</button>
         </div>
