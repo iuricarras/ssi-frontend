@@ -5,6 +5,6 @@ import { authGuard } from "../auth/guard/AuthGuard";
 
 
 export const CARTEIRA_ROUTES: Routes = [
-    { path: ':username', component: CarteiraUser, canActivate: [authGuard]},
+    { path: 'public/:username', component: CarteiraUser, canActivate: [authGuard]},
     { path: '', component: Carteira, canActivate: [authGuard]}
 ];

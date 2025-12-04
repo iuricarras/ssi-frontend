@@ -293,7 +293,7 @@ export class Carteira implements OnInit {
   }
 
   goToUserWallet(username: string) {
-    this.router.navigate(['/carteira', username]);
+    this.router.navigate(['/carteira/public', username]);
   }
   
 }

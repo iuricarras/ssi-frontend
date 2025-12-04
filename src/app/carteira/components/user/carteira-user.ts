@@ -31,6 +31,7 @@ export class CarteiraUser implements OnInit {
   // Dados do Utilizador (Perfil Visualizado)
   nome: string = '';
   username: string = '';
+  userId: string = '';
   email: string = '';
   dadosCarteira: any[] = [];
 
@@ -71,10 +72,14 @@ export class CarteiraUser implements OnInit {
 
 
   ngOnInit() {
-    // 1. Obter username da URL e carregar dados públicos da carteira
-    this.route.params.subscribe(params => {
-      this.username = params['username'];
-      this.carregarDadosCarteiraPublica();
+    // Obter username 
+    this.route.paramMap.subscribe(params => {
+      const username = params.get('username');
+      if (username) {
+        this.username = username;
+        this.carregarDadosCarteiraPublica();
+        this.loadAuthenticatedName();
+      }
     });
 
     // 2. Obter info do utilizador autenticado (para saber se é certificadora, etc.)
@@ -99,7 +104,7 @@ export class CarteiraUser implements OnInit {
       next: (userData: UserData) => {
         this.nome = userData.nome;
         this.email = userData.email || '';
-        this.username = userData.username || "";
+        this.userId = userData.id;
       },
       error: (error: any) => {
         this.nome = 'Utilizador não encontrado';
@@ -124,6 +129,10 @@ export class CarteiraUser implements OnInit {
         this.emissorNome = user.nome;
         console.log('User data loaded:', user);
         this.certificadora = !!(user && user.isEC);
+
+        if (this.username && user.username === this.username) {
+          this.router.navigate(['/carteira']);
+        }
       },
       error: () => {
         this.emissorNome = '';
@@ -199,8 +208,8 @@ export class CarteiraUser implements OnInit {
       this.mensagemErro = 'É necessário fornecer uma chave para o pedido.';
       return;
     }
-    const payload = { item: this.itemSelecionado, mensagem: this.mensagemPedido, chave: this.chavePedido };
-    this.carteiraService.requestInfo(this.username, payload).subscribe({
+    
+    this.carteiraService.requestVerification(this.email, this.itemSelecionado, this.chavePedido).subscribe({
       next: (resp) => {
         this.fecharConfirmacao();
       },
@@ -354,6 +363,6 @@ export class CarteiraUser implements OnInit {
   }
 
   goToUserWallet(username: string) {
-    this.router.navigate(['/carteira', username]);
+    this.router.navigate(['/carteira/public', username]);
   }
 }

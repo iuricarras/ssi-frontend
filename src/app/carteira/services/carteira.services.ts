@@ -37,7 +37,6 @@ export class CarteiraService {
     );
   }
 
-
   // para visualizar carteiras por username
   getUserDataByUsername(username: string): Observable<UserData> {
     return this.http.get<UserData>(`${this.API}/carteira/user/${encodeURIComponent(username)}/profile`, { withCredentials: true });
@@ -46,19 +45,19 @@ export class CarteiraService {
     return this.http.get<CarteiraData>(`${this.API}/carteira/user/${encodeURIComponent(username)}`, { withCredentials: true });
   }
 
-  // pedir informações  ao utilizador
-  requestInfo(username: string, payload: { item: any; mensagem?: string }): Observable<HttpResponse<any>> {
-    return this.http.post<any>(`${this.API}/carteira/user/${encodeURIComponent(username)}/request-info`,
-      payload,
+  // enviar certificado assinado
+  sendCertificateWithSignature(username: string, certificate: any, signature: string): Observable<HttpResponse<any>> {
+    return this.http.post<any>(`${this.API}/carteira/user/certificates`,
+      { username, certificate, signature },
       { observe: 'response', withCredentials: true }
     );
   }
 
-  // enviar certificado assinado
-  sendCertificateWithSignature(username: string, certificate: any, signature: string): Observable<HttpResponse<any>> {
-    return this.http.post<any>(`${this.API}/carteira/user/${encodeURIComponent(username)}/certificates`,
-      { certificate, signature },
+  requestVerification(verificationUser: string, verificationDataType: any, masterKey: string): Observable<HttpResponse<any>> {
+    return this.http.post<any>(`${this.API}/verify/request-verification`,
+      { verificationUser, verificationDataType, masterKey },
       { observe: 'response', withCredentials: true }
     );
   }
+  
 }
