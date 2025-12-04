@@ -22,9 +22,13 @@
         <div class="button-group">
           <button
             type="submit"
-            [disabled]="emailForm.invalid"
+            [disabled]="emailForm.invalid || enviando"
             class="registar">
-            Enviar código
+            @if (enviando) {
+              Enviando...
+            } @else {
+              Enviar código
+            }
           </button>
         </div>
         <div class="button-group">

@@ -28,6 +28,7 @@ export class UserLogin implements OnInit {
   public errorMessage: string | null = null;
   private currentEmail: string | null = null;
   private challengeId: string | null = null;
+  public enviando: boolean = false;
 
   emailForm = new FormGroup({
     email: new FormControl("", [Validators.required, Validators.email])
@@ -50,17 +51,20 @@ export class UserLogin implements OnInit {
   }
 
   sendEmail(): void {
+    this.enviando = true;
     const email = this.emailForm.get("email")?.value;
     this.message = null;
     this.errorMessage = null;
 
     if (!email) {
       this.errorMessage = "Por favor, insira um e-mail válido.";
+      this.enviando = false;
       return;
     }
     try {
     this.authService.requestLoginCode(email).subscribe({
       next: (response: HttpResponse<any>) => {
+        this.enviando = false;
         const body = response.body;
         if (response.status === 200 && body?.challenge_id) {
           this.currentEmail = email;
@@ -73,10 +77,12 @@ export class UserLogin implements OnInit {
       },
         error: () => {
           this.errorMessage = "Erro ao enviar código. Tente novamente.";
+          this.enviando = false;
         }
       });
     } catch {
       this.errorMessage = "Erro inesperado durante o envio do e-mail.";
+      this.enviando = false;
     }
   }
 

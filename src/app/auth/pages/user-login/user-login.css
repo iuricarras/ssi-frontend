@@ -60,7 +60,6 @@ button[mat-raised-button]:hover {
   background-color: #7f3ffb;
 }
 
-
 .feedback {
   margin-top: 20px;
 }
@@ -96,6 +95,13 @@ button.registar {
 
 button.registar:hover {
   background-color: #7f3ffb;
+}
+
+button.registar:disabled {
+  background-color: var(--light-purple) !important;
+  color: var(--text-dark);
+  cursor: not-allowed;
+  opacity: 0.7;
 }
 
 
