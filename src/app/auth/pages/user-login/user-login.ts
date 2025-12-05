@@ -103,6 +103,9 @@ export class UserLogin implements OnInit {
       this.authService.verifyLoginCode(this.currentEmail, this.challengeId, code).subscribe({
         next: (response: HttpResponse<any>) => {
           if (response.status === 200) {
+            console.log('Login response:', response);
+            var hmacCode = this.currentEmail + "." + response.body.session_nonce;
+            localStorage.setItem("hmacCode", hmacCode);
             this.message = "Login efetuado com sucesso.";
             setTimeout(() => this.router.navigateByUrl("/home/main-page"), 1000);
           } else {

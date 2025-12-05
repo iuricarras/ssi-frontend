@@ -11,7 +11,7 @@ import { Observable } from 'rxjs';
 import { startWith, map } from 'rxjs/operators';
 import { AuthService } from '../../auth/services/auth.service';
 import { CarteiraService } from '../../carteira/services/carteira.services';
-
+import { verifywithHMAC } from '../../utils/hmac';
 @Component({
   selector: 'app-main-page',
   standalone: true,
@@ -80,9 +80,14 @@ export class MainPage {
 
   loadAuthenticated() {
     this.carteiraService.getUserData().subscribe({
-      next: (user) => {
-        console.log('User data loaded:', user);
-        this.certificadora = !!(user && user.isEC);
+      next: (message) => {
+        var user = message.data;
+        if (verifywithHMAC(JSON.stringify(user), message.hmac)) {
+          console.log('User data loaded:', user);
+          this.certificadora = !!(user && user.isEC);
+        } else {
+          console.error('HMAC verification failed for user data');
+        }
       },
       error: () => {
         this.certificadora = false;

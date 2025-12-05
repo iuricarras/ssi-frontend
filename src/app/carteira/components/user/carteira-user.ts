@@ -8,7 +8,7 @@ import { AuthService } from '../../../auth/services/auth.service';
 import { UserService } from '../../../home/main-page/services/user.service';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
-
+import { verifywithHMAC } from '../../../utils/hmac';
 @Component({
   selector: 'app-carteira-user',
   standalone: true,
@@ -96,10 +96,15 @@ export class CarteiraUser implements OnInit {
   carregarDadosCarteiraPublica() {
     // Dados básicos do utilizador
     this.carteiraService.getUserDataByUsername(this.username).subscribe({
-      next: (userData: UserData) => {
-        this.nome = userData.nome;
-        this.email = userData.email || '';
-        this.username = userData.username || "";
+      next: (message) => {
+        var userData = message.data;
+        if (verifywithHMAC(JSON.stringify(userData), message.hmac)) {
+          this.nome = userData.nome;
+          this.email = userData.email || '';
+          this.username = userData.username || "";
+        } else {
+          console.error('HMAC verification failed for user data');
+        }
       },
       error: (error: any) => {
         this.nome = 'Utilizador não encontrado';
@@ -108,8 +113,13 @@ export class CarteiraUser implements OnInit {
 
     // Dados da carteira (apenas estrutura pública)
     this.carteiraService.getCarteiraDataByUsername(this.username).subscribe({
-      next: (carteiraData: CarteiraData) => {
-        this.dadosCarteira = this.processarDadosCarteira(carteiraData);
+      next: (message) => {
+        var carteiraData = message.data;
+        if (verifywithHMAC(JSON.stringify(carteiraData), message.hmac)) {
+          this.dadosCarteira = this.processarDadosCarteira(carteiraData);
+        } else {
+          console.error('HMAC verification failed for carteira data');
+        }
       }
     });
   }
@@ -120,10 +130,15 @@ export class CarteiraUser implements OnInit {
    */
   loadAuthenticatedName() {
     this.carteiraService.getUserData().subscribe({
-      next: (user) => {
-        this.emissorNome = user.nome;
-        console.log('User data loaded:', user);
-        this.certificadora = !!(user && user.isEC);
+      next: (message) => {
+        var user = message.data;
+        if (verifywithHMAC(JSON.stringify(user), message.hmac)) {
+          this.emissorNome = user.nome;
+          console.log('User data loaded:', user);
+          this.certificadora = !!(user && user.isEC);
+        } else {
+          console.error('HMAC verification failed for user data');
+        }
       },
       error: () => {
         this.emissorNome = '';

@@ -8,7 +8,7 @@ import { AuthService } from '../../../auth/services/auth.service';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { UserService } from '../../../home/main-page/services/user.service';
-
+import { verifywithHMAC } from '../../../utils/hmac';
 @Component({
   selector: 'app-carteira',
   standalone: true,
@@ -72,10 +72,16 @@ export class Carteira implements OnInit {
   /** Carrega as informações básicas do perfil do utilizador. */
   carregarDadosUtilizador() {
     this.carteiraService.getUserData().subscribe({
-      next: (userData: UserData) => {
-        this.nome = userData.nome;
-        this.username = userData?.username || "";
-        this.email = userData?.email || "";
+      next: (message) => {
+        var userData = message.data;
+        if (verifywithHMAC(JSON.stringify(userData), message.hmac)) {
+          this.nome = userData.nome;
+          this.username = userData?.username || "";
+          this.email = userData?.email || "";
+        } else {
+          console.error('HMAC verification failed for user data');
+          return
+        }
       },
       error: () => {
         this.nome = 'Erro ao carregar os dados do Utilizador';
@@ -93,7 +99,12 @@ export class Carteira implements OnInit {
     }
 
     this.carteiraService.getCarteiraData(this.input).subscribe({
-      next: (carteiraData) => {
+      next: (message) => {
+        var carteiraData = message.data;
+        if (!verifywithHMAC(JSON.stringify(carteiraData), message.hmac)) {
+          this.mensagemErro = 'Falha na verificação dos dados da carteira.';
+          return;
+        }
         this.dadosAcessiveis = true;
         this.dadosCarteira = this.processarDadosCarteira(carteiraData)
       },
@@ -257,7 +268,11 @@ export class Carteira implements OnInit {
 
   enviarAtualizacaoParaServidor(dados: any[], masterKey: string) {
     this.carteiraService.updateCarteiraData(dados, masterKey).subscribe({
-      next: () => {
+      next: (message) => {
+        if (!verifywithHMAC(JSON.stringify(message.data), message.hmac)) {
+          this.mensagemErro = 'Falha na verificação dos dados da carteira.';
+          return;
+        }
         this.dadosCarteira = dados;
       },
       error: (error) => {
