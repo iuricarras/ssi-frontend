@@ -23,6 +23,10 @@ export const APP_ROUTES: Routes = [
   path: 'verification',
   loadChildren: () => import('./verification/verification.routes').then(m => m.VERIFICATION_ROUTES),
   },
+  {
+    path: 'notifications', 
+    loadChildren: () => import('./notification/notification.routes').then(m => m.NOTIFICATION_ROUTES),
+  },
 
   { path: '**', redirectTo: '' },
 ];

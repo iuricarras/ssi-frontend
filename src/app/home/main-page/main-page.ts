@@ -75,7 +75,7 @@ export class MainPage {
   goToUserWallet(username: string) {
     if (!username) return;
     this.searchControl.setValue('');
-    this.router.navigate(['/carteira', username]);
+    this.router.navigate(['/carteira/public', username]);
   }
 
   loadAuthenticated() {

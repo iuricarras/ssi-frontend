@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-SK_FILE="sksign.pem"
+SK_FILE="sk.pem"
 INPUT_FILE="$1"
 
 if [ -z "$INPUT_FILE" ]; then
