@@ -48,7 +48,7 @@ export class UserRegisterComponent {
     this.registerService.registerUser(this.userData).subscribe({
       next: () => {
         alert("Registo efetuado com sucesso!");
-        this.router.navigateByUrl("/login");
+        this.router.navigateByUrl("/auth/user-login");
       },
       error: (err) => {
         console.error("Erro de registo:", err);
