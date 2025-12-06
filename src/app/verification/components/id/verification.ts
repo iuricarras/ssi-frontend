@@ -35,6 +35,18 @@ export class VerificationComponent implements OnInit {
     this.verificationId = this.route.snapshot.paramMap.get('id') || '';
   }
 
+
+  /**
+   * getVerification()
+   * Executa o processo de obtenção de dados de verificação.
+   * Primeiro valida se a masterKey foi preenchida.
+   * Se estiver vazia, define mensagem de erro e interrompe o processo.
+   * Se estiver preenchida:
+   *   - Limpa as mensagens de erro anteriores.
+   *   - Faz uma requisição PUT para /verify/get-verifications/:id com a masterKey.
+   *   - Se a resposta for bem-sucedida, guarda os dados recebidos em verificationData.
+   *   - Se houver um erro, define uma mensagem de erro.
+   */
   getVerification() {
     if (!this.masterKey.trim()) {
       this.error = 'A chave mestra é obrigatória.';

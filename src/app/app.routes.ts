@@ -1,6 +1,12 @@
 import { Routes } from '@angular/router';
 import { HomeLogin } from './auth/pages/home-login/home-login';
 
+
+/**
+ * APP_ROUTES
+ * Conjunto principal de rotas da aplicação.
+ * Define os caminhos base e organiza o carregamento dos diferentes módulos funcionais.
+ */
 export const APP_ROUTES: Routes = [
   { path: '', redirectTo: 'home/main-page', pathMatch: 'full' },
   {

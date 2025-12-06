@@ -45,6 +45,13 @@ export class MainPage {
     });
   }
 
+
+  /**
+   * onLogout()
+   * Faz logout do utilizador chamando o AuthService.
+   * Se a operação for bem-sucedida, redireciona para /auth/home-login.
+   * Se ocorrer erro, mostra no terminal e redireciona igualmente para /auth/home-login.
+   */
   public onLogout(): void {
     this.authService.logout().subscribe({
       next: (): void => {
@@ -57,6 +64,13 @@ export class MainPage {
     });
   }
 
+
+  /**
+   * onSearch(query: string)
+   * Executa pesquisa de utilizadores com base no texto inserido.
+   * Se a query estiver vazia, limpa os resultados.
+   * Caso contrário, chama userService.searchUsers(query) e atualiza searchResults.
+   */
   onSearch(query: string) {
   if (!query.trim()) {
     this.searchResults = [];
@@ -66,18 +80,41 @@ export class MainPage {
   this.userService.searchUsers(query).subscribe(res => {
     this.searchResults = res;
   });
-}
+  }
 
+
+  /**
+   * selectUser(username: string)
+   * Define o valor do campo de pesquisa para o username selecionado.
+   * Usado quando o utilizador escolhe um item da lista de resultados.
+   */
   selectUser(username: string) {
     this.searchControl.setValue(username);
   }
 
+
+  /**
+   * goToUserWallet(username: string)
+   * Redireciona para a carteira pública do utilizador selecionado.
+   * Se não houver username, não faz nada.
+   * Caso contrário, limpa o campo de pesquisa e navega para /carteira/public/:username.
+   */
   goToUserWallet(username: string) {
     if (!username) return;
     this.searchControl.setValue('');
     this.router.navigate(['/carteira/public', username]);
   }
 
+
+  /**
+   * loadAuthenticated()
+   * Carrega dados do utilizador autenticado através da CarteiraService.
+   * Se a resposta contiver dados válidos e a verificação HMAC for bem sucedida:
+   *   - Mostra os dados no temrinal.
+   *   - Define certificadora como true se o utilizador for uma entidade credenciadora (isEC).
+   * Se a verificação falhar, mostra erro no terminal.
+   * Em caso de erro na requisição, define certificadora como false.
+   */
   loadAuthenticated() {
     this.carteiraService.getUserData().subscribe({
       next: (message) => {

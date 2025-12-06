@@ -39,6 +39,17 @@ export class UserRegisterComponent {
     private router: Router
   ) {}
 
+
+  /**
+   * onSubmit(form)
+   * Executa o processo de registo de um novo utilizador.
+   * Primeiro valida se o formulário está corretamente preenchido.
+   *   - Se não estiver válido, mostra um alerta a pedir para preencher os campos obrigatórios.
+   * Se estiver válido:
+   *   - Chama registerService.registerUser() com os dados inseridos (username, email, nome).
+   *   - Se a resposta for bem-sucedida, mostra um alerta de sucesso e redireciona para /auth/user-login.
+   *   - Se houver um erro, mostra um alerta com a mensagem de erro.
+   */
   onSubmit(form: NgForm) {
     if (!form.valid) {
       alert("Por favor, preencha todos os campos obrigatórios.");
@@ -57,6 +68,12 @@ export class UserRegisterComponent {
     });
   }
 
+
+  /**
+   * goToLogin()
+   * Redireciona o utilizador para a página de login.
+   * Caminho: /auth/user-login
+   */
   goToLogin() {
     this.router.navigateByUrl("/auth/user-login");
   }
