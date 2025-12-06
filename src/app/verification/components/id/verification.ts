@@ -3,6 +3,8 @@ import { ActivatedRoute } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule, NgIf, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { MatIconModule } from '@angular/material/icon';
+
 
 @Component({
   selector: 'app-verification',
@@ -11,7 +13,8 @@ import { FormsModule } from '@angular/forms';
     CommonModule,
     FormsModule,
     NgIf,
-    DatePipe
+    DatePipe,
+    MatIconModule 
   ],
   templateUrl: './verification.html',
   styleUrls: ['./verification.css']

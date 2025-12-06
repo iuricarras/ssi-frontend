@@ -1,0 +1,36 @@
+<div class="pedidos-container">
+  <!-- Header igual ao das notificações -->
+  <header class="header">
+    <nav class="nav-content">
+      <div class="nav-left">
+        <div class="logo">
+          <a routerLink="/home/main-page">
+            <img src="logo.png" alt="Logo" class="logo-image">
+          </a>
+        </div>
+      </div>
+
+      <div class="nav-right">
+        <button mat-button routerLink="/home/main-page">HOME</button>
+        <button mat-button (click)="onLogout()">LOG OUT</button>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Lista de pedidos -->
+  <div class="pedidos-list">
+    <div *ngIf="loading">Carregando...</div>
+    <div *ngIf="error" class="error">{{ error }}</div>
+
+    <div *ngFor="let v of verifications" class="pedido-item">
+      <div class="linha" *ngIf="v.accepted">
+        Aceite: {{ v.verification_data_type_display }} - {{ timeLeft(v.expires_at) }}
+        <button mat-button (click)="openVerification(v.verification_id, v.accepted)">Ver</button>
+      </div>
+      <div class="linha pendente" *ngIf="!v.accepted">
+        Pendente: {{ v.verification_data_type_display }} - {{ timeLeft(v.expires_at) }}
+      </div>
+    </div>
+
+  </div>
+</div>
