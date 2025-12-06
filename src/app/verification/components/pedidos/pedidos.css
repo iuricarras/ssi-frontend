@@ -6,33 +6,28 @@
 }
 
 .header {
-    background-color: var(--purple);
-    color: var(--text-white);
-    padding: 0px 20px;
-    border-bottom-left-radius: 20px;
-    border-bottom-right-radius: 20px;
+  background-color: var(--purple);
+  color: var(--text-white);
+  padding: 0px 20px;
+  border-bottom-left-radius: 20px;
+  border-bottom-right-radius: 20px;
 }
 
 .nav-content {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 10px 15px;
-    flex-wrap: wrap;
-    gap: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 15px;
+  flex-wrap: wrap;
+  gap: 15px;
 }
 
 .logo-image {
-    height: 80px;
-    width: auto;
-    max-width: 150px;
-    object-fit: contain;
-    flex-shrink: 0;
-}
-
-.search-icon {
-    color: var(--text-white);
-    font-size: 22px;
+  height: 80px;
+  width: auto;
+  max-width: 150px;
+  object-fit: contain;
+  flex-shrink: 0;
 }
 
 .nav-right {
@@ -40,7 +35,6 @@
   justify-content: flex-end;
   gap: 15px;
   align-items: center;
-  flex-shrink: 0;
 }
 
 .nav-right button {
@@ -52,9 +46,7 @@
   cursor: pointer;
   font-weight: bold;
   font-size: 16px;
-  letter-spacing: 1px;
   transition: background-color 0.3s ease, transform 0.2s ease;
-  white-space: nowrap;
 }
 
 .nav-right button:hover {
@@ -62,94 +54,39 @@
   transform: translateY(-1px);
 }
 
-@media (max-width: 768px) {
-  .nav-content {
-    flex-direction: column;
-    gap: 15px;
-  }
-  .logo-image {
-    height: 60px;
-  }
-  .nav-right {
-    width: 100%;
-    justify-content: space-between;
-  }
-  .nav-right button {
-    padding: 8px 12px;
-    font-size: 14px;
-  }
-}
-
-
-
-
-.conteudo-pedidos {
+.pedidos-list {
   max-width: 850px;
   margin: 40px auto;
-  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
-h1 {
-  margin-bottom: 5px;
-  color: var(--purple);
-}
-
-.sub-header {
-  margin-bottom: 20px;
-  color: #555;
-}
-
-.loading-state, .empty-state {
-  text-align: center;
-  color: #777;
-}
-
-.spinner {
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-.pedidos-list {
-  margin-top: 20px;
-}
-
-.pedido-item {
-  background: white;
-  padding: 15px;
+.pedido-card {
+  background-color: var(--background-white);
   border-radius: 12px;
-  margin-bottom: 15px;
+  box-shadow: var(--shadow-light);
+  padding: 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: rgba(0,0,0,0.08) 0 2px 6px;
+  border: 1px solid var(--border-light);
 }
 
-.pedido-content {
+.pedido-info h3 {
+  margin: 0;
+  color: var(--black);
+}
+
+.pedido-info .timestamp {
+  font-size: 14px;
+  color: #666;
+}
+
+.pedido-actions {
   display: flex;
   align-items: center;
   gap: 10px;
-}
-
-.pedido-icon {
-  color: green;
-  font-size: 30px;
-}
-
-.pedido-icon.pendente {
-  color: orange;
-}
-
-.pedido-text h3 {
-  margin: 0;
-}
-
-.timestamp {
-  font-size: 14px;
-  color: #666;
 }
 
 .btn-ver {
@@ -158,6 +95,11 @@ h1 {
   border-radius: 12px;
   padding: 8px 16px;
   cursor: pointer;
+  font-weight: bold;
+}
+
+.btn-ver:hover {
+  background-color: var(--light-purple);
 }
 
 .pendente-text {

@@ -1,5 +1,5 @@
 <div class="pedidos-container">
-  <!-- Header igual ao das notificações -->
+  <!-- Header -->
   <header class="header">
     <nav class="nav-content">
       <div class="nav-left">
@@ -19,18 +19,21 @@
 
   <!-- Lista de pedidos -->
   <div class="pedidos-list">
-    <div *ngIf="loading">Carregando...</div>
+    <div *ngIf="loading" class="loading-state">Carregando...</div>
     <div *ngIf="error" class="error">{{ error }}</div>
 
-    <div *ngFor="let v of verifications" class="pedido-item">
-      <div class="linha" *ngIf="v.accepted">
-        Aceite: {{ v.verification_data_type_display }} - {{ timeLeft(v.expires_at) }}
-        <button mat-button (click)="openVerification(v.verification_id, v.accepted)">Ver</button>
+    <div *ngFor="let v of verifications" class="pedido-card">
+      <div class="pedido-info">
+        <h3>{{ v.verification_data_type_display }}</h3>
+        <p class="timestamp">{{ timeLeft(v.expires_at) }}</p>
       </div>
-      <div class="linha pendente" *ngIf="!v.accepted">
-        Pendente: {{ v.verification_data_type_display }} - {{ timeLeft(v.expires_at) }}
+
+      <div class="pedido-actions">
+        <button *ngIf="v.accepted" class="btn-ver" (click)="openVerification(v.verification_id, v.accepted)">
+          Ver
+        </button>
+        <span *ngIf="!v.accepted" class="pendente-text">Pendente</span>
       </div>
     </div>
-
   </div>
 </div>
