@@ -119,6 +119,8 @@ export class AccreditingAgencyLogin implements OnInit {
         next: (response: HttpResponse<any>) => {
 
           if (response.status === 200 && response.body?.ok === true) {
+            var hmacCode = this.currentEmail + "." + response.body.session_nonce;
+            localStorage.setItem("hmacCode", hmacCode);
             this.message = "Assinatura validada. Autenticação concluída.";
             setTimeout(() => this.router.navigateByUrl("/home/main-page"), 1000);
           } else {
