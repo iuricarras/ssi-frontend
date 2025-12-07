@@ -1,3 +1,4 @@
+// src/app/notification/components/notification/notification.ts
 import { Component, OnInit } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
@@ -56,7 +57,7 @@ export class NotificationComponent implements OnInit {
           this.isLoading = false;
           return;
         }
-        // O backend retorna um objeto com a chave 'notifications'
+        // O backend retorna um array de notificações
         this.notifications = data || [];
         this.isLoading = false;
       },
@@ -86,17 +87,17 @@ export class NotificationComponent implements OnInit {
   handleAccept(): void {
     if (!this.selectedNotification) return;
 
-    // A chave mestra é obrigatória para aceitar adição de certificados
-    if (this.selectedNotification.type === 'CERTIFICATE_ADDITION' && !this.masterKey.trim()) {
-      this.modalErrorMessage = "A Chave Mestra é obrigatória para adicionar um certificado.";
+    // A chave mestra é obrigatória para qualquer ACCEPT
+    if (!this.masterKey.trim()) {
+      this.modalErrorMessage = "A Chave Mestra é obrigatória para aceitar a requisição.";
       return;
     }
 
     this.modalErrorMessage = null;
     this.isLoading = true;
 
-    // Master Key pode ser null se o tipo de notificação não for CERTIFICATE_ADDITION
-    const key = this.selectedNotification.type === 'CERTIFICATE_ADDITION' ? this.masterKey : null;
+    // A chave mestra é sempre enviada para ACCEPT
+    const key = this.masterKey;
     
     this.notificationService.respondToNotification(this.selectedNotification.notification_id, 'ACCEPT', key).subscribe({
       next: (message) => {
@@ -123,7 +124,8 @@ export class NotificationComponent implements OnInit {
     this.errorMessage = null;
     this.successMessage = null;
     
-    this.notificationService.respondToNotification(notification.notification_id, 'REJECT').subscribe({
+    // Para REJECT, não precisamos de chave mestra.
+    this.notificationService.respondToNotification(notification.notification_id, 'REJECT', null).subscribe({
       next: (message) => {
         var data = message.data;
         var hmac = message.hmac;
@@ -161,7 +163,9 @@ export class NotificationComponent implements OnInit {
     if (notification.type === 'CERTIFICATE_ADDITION') {
       return `Novo Certificado: ${notification.payload.certificate_name}`;
     }
-    // Adicionar outros títulos conforme os tipos de notificação...
+    if (notification.type === 'VERIFICATION_REQUEST') {
+      return `Pedido de Informação: ${notification.payload.verification_type}`;
+    }
     return 'Nova Requisição Pendente';
   }
 }

@@ -1,3 +1,4 @@
+<!-- src/app/carteira/components/user/carteira-user.html -->
 <div class="perfil-container">
   <header class="header">
     <nav class="nav-content">
@@ -58,10 +59,12 @@
       <div *ngFor="let dado of getDadosPessoais()" class="item-dado">
         <div class="dado-header">
           <div class="dado-info">
+            <!-- A chave agora é 'chave' que tem o nome do campo/certificado -->
             <h3>{{ dado.chave }}</h3>
           </div>
               <div class="dado-actions">
-                <button class="btn-request" (click)="abrirConfirmacaoPedido(dado)">
+                <!-- Passamos o dado completo, que tem 'chave' e 'tipo' (personalData) -->
+                <button *ngIf="certificadora" class="btn-request" (click)="abrirConfirmacaoPedido(dado)">
                   Pedir Informação
                 </button>
               </div>
@@ -72,11 +75,13 @@
       <div *ngFor="let certificado of getCertificados()" class="item-dado">
         <div class="dado-header">
           <div class="dado-info">
-            <h3>{{ certificado.nome }}</h3>
+            <!-- A chave agora é 'chave' que tem o nome do campo/certificado -->
+            <h3>{{ certificado.chave }}</h3>
             <p class="certificado-label">Certificado</p>
           </div>
           <div class="dado-actions">
-            <button class="btn-request" (click)="abrirConfirmacaoPedido(certificado)">
+            <!-- Passamos o dado completo, que tem 'chave' e 'tipo' (certificate) -->
+            <button *ngIf="certificadora" class="btn-request" (click)="abrirConfirmacaoPedido(certificado)">
               Pedir Informação
             </button>
           </div>
@@ -86,7 +91,7 @@
 
       <div *ngIf="dadosCarteira.length === 0" class="item-dado">
         <h3>Carteira Vazia</h3>
-        <p class="valor-dado">Ainda não tem informação na sua carteira.</p>
+        <p class="valor-dado">Ainda não tem informação pública na sua carteira.</p>
       </div>
       
     </div>
@@ -107,16 +112,18 @@
     <div class="modal-body">
       <p>Pretende pedir a seguinte informação?</p>
       <div class="form-group">
-        <label>Item:</label>
-        <div class="valor-dado">{{ itemSelecionado?.chave || itemSelecionado?.nome }}</div>
+        <label>Item Solicitado:</label>
+        <!-- Item selecionado agora usa 'chave' -->
+        <div class="valor-dado">{{ itemSelecionado?.chave }} ({{ itemSelecionado?.tipo === 'personalData' ? 'Dado Pessoal' : 'Certificado' }})</div>
       </div>
       <div class="form-group">
         <label>Mensagem (opcional):</label>
         <input class="form-input" type="text" [(ngModel)]="mensagemPedido" placeholder="Mensagem..." />
       </div>
       <div class="form-group">
-        <label>Chave-Mestra *: </label>
-        <input class="form-input" type="text" [(ngModel)]="chavePedido" name="chavePedido" placeholder="Insira uma chave" required />
+        <label>Chave-Mestra * (Sua Chave EC): </label>
+        <input class="form-input" type="text" [(ngModel)]="chavePedido" name="chavePedido" placeholder="Insira a chave que usará para decifrar os dados" required />
+        <p class="info-small">Esta chave será usada para cifrar os dados para si, se o utilizador aceitar.</p>
       </div>
     </div>
 

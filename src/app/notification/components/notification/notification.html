@@ -1,3 +1,4 @@
+<!-- src/app/notification/components/notification/notification.html -->
 <div class="notifications-container">
     <header class="header">
         <nav class="nav-content">
@@ -80,21 +81,25 @@
         </div>
         
         <div class="modal-body">
+            
             <p *ngIf="selectedNotification?.type === 'CERTIFICATE_ADDITION'">
-                Confirma que pretende **aceitar** esta requisição de adição de certificado?
-            </p>
-             <p *ngIf="selectedNotification?.type === 'VERIFICATION_REQUEST'">
-                Confirma que pretende **aceitar** que a entidade requerente aceda aos dados solicitados para verificação?
+                Confirma que pretende **aceitar** esta requisição de adição de certificado? O certificado será cifrado na sua carteira.
             </p>
             
-            <div *ngIf="selectedNotification?.type === 'CERTIFICATE_ADDITION'" class="master-key-section">
+            <!-- Correção aqui: forçamos a leitura da propriedade 'payload' como se não fosse nula (!) -->
+            <p *ngIf="selectedNotification?.type === 'VERIFICATION_REQUEST'">
+                Confirma que pretende **aceitar** este pedido de partilha do dado 
+                **{{ selectedNotification!.payload!.verification_type }}**? O dado será cifrado com a chave do requerente e partilhado.
+            </p>
+
+            <div class="master-key-section">
                 <p class="warning-text">
                     <mat-icon>vpn_key</mat-icon>
-                    Para adicionar um certificado à sua carteira, é necessário cifrá-lo com a sua Chave Mestra.
+                    Para processar esta requisição, é necessário que insira a sua **Chave Mestra** para decifrar os dados da sua carteira.
                 </p>
                 
                 <div class="form-group">
-                    <label for="masterKeyInput">Chave Mestra:</label>
+                    <label for="masterKeyInput">Sua Chave Mestra:</label>
                     <input
                         id="masterKeyInput"
                         type="password"
@@ -105,27 +110,6 @@
                 </div>
             </div>
             
-            <!-- A chave mestra também seria necessária para aceitar a verificação, se o backend o exigir. 
-            No backend atual, a chave mestra é passada no corpo do request para aceitar a verificação.
-            Portanto, para VERIFICATION_REQUEST, também precisamos da chave mestra. -->
-            <div *ngIf="selectedNotification?.type === 'VERIFICATION_REQUEST'" class="master-key-section">
-                <p class="warning-text">
-                    <mat-icon>vpn_key</mat-icon>
-                    Para permitir a verificação, é necessário decifrar temporariamente os dados com a sua Chave Mestra.
-                </p>
-                
-                <div class="form-group">
-                    <label for="masterKeyInputVerification">Chave Mestra:</label>
-                    <input
-                        id="masterKeyInputVerification"
-                        type="password"
-                        [(ngModel)]="masterKey"
-                        placeholder="Insira a sua chave mestra"
-                        class="form-input"
-                    />
-                </div>
-            </div>
-
             <div *ngIf="modalErrorMessage" class="feedback error-message-modal">
                 <mat-icon>error</mat-icon> {{ modalErrorMessage }}
             </div>
@@ -133,7 +117,7 @@
         
         <div class="modal-footer">
             <button class="btn-cancelar" (click)="closeModal()">Cancelar</button>
-            <button class="btn-confirmar" (click)="handleAccept()" [disabled]="isLoading || (!masterKey.trim() && (selectedNotification?.type === 'CERTIFICATE_ADDITION' || selectedNotification?.type === 'VERIFICATION_REQUEST'))">
+            <button class="btn-confirmar" (click)="handleAccept()" [disabled]="isLoading || !masterKey.trim()">
                 <span *ngIf="!isLoading">Confirmar Aceitação</span>
                 <span *ngIf="isLoading"><mat-icon class="spinner">autorenew</mat-icon> A processar...</span>
             </button>

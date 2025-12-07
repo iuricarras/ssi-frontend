@@ -1,3 +1,4 @@
+// src/app/carteira/services/carteira.services.ts
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpResponse, HttpHeaders } from "@angular/common/http";
 import { Observable } from 'rxjs';
@@ -15,11 +16,10 @@ export interface CarteiraData {
   personalData: any;
 }
 
-// Interface para o payload de requisição de verificação (para endpoint /verify/request-verification)
-export interface VerificationRequestPayload {
-  masterKey: string;
-  verificationUser: string; // ID (email) do utilizador alvo
-  verificationDataType: string; // Campo ou nome do certificado solicitado
+// Interface para o dado solicitado no pedido de verificação
+export interface VerificationDataType {
+  chave: string; // Nome do campo ou certificado
+  tipo: 'personalData' | 'certificate'; // O tipo de dado
 }
 
 @Injectable({
@@ -79,29 +79,25 @@ export class CarteiraService {
   }
 
   // ENDPOINTS NOTIFICAÇÕES/VERIFICAÇÃO
-
-  /** * Solicita uma nova verificação de dados a um utilizador (usado pela EC/requerente).
-   * Endpoint do backend: /verify/request-verification
-   */
-  // requestVerification(payload: VerificationRequestPayload): Observable<HttpResponse<any>> {
-  //   return this.http.post<any>(`${this.API}/verify/request-verification`,
-  //     payload,
-  //     { observe: 'response', withCredentials: true }
-  //   );
-  // }
-
  
-   /**
-   * requestVerification(verificationUser, verificationDataType, masterKey)
+  /**
+   * requestVerification(recipientEmail, verificationDataType, masterKey)
    * Solicita uma verificação de dados a outro utilizador (usado pela EC/requerente).
    * Endpoint: /verify/request-verification
-   * Envia email do utilizador alvo, tipo de dado a verificar e masterKey.
+   * Envia email do utilizador alvo, tipo de dado a verificar e masterKey (do EC).
    * Assina payload com HMAC.
    * Retorna resposta validada com HMACPayload<any>.
    */
-  requestVerification(verificationUser: string, verificationDataType: any, masterKey: string): Observable<HMACPayload<any>> {
+  requestVerification(recipientEmail: string, verificationDataType: VerificationDataType, masterKey: string): Observable<HMACPayload<any>> {
+    // O backend espera: { verificationUser: email_alvo, verificationDataType: {chave, tipo}, masterKey: chave_ec }
+    const data = {
+      verificationUser: recipientEmail, 
+      verificationDataType: verificationDataType, 
+      masterKey: masterKey
+    };
+
     return this.http.post<HMACPayload<any>>(`${this.API}/verify/request-verification`,
-      { data: {verificationUser, verificationDataType, masterKey} , hmac: signwithHMAC(JSON.parse(JSON.stringify({verificationUser, verificationDataType, masterKey}))) },
+      { data: data , hmac: signwithHMAC(JSON.parse(JSON.stringify(data))) },
       { withCredentials: true }
     );
   }

@@ -1,3 +1,4 @@
+// src/app/notification/services/notification.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpResponse } from "@angular/common/http";
 import { Observable } from 'rxjs';
@@ -7,9 +8,11 @@ export interface Notification {
     notification_id: string;
     requester_id: string;
     requester_name: string;
-    type: 'CERTIFICATE_ADDITION' | 'VERIFICATION_REQUEST'; 
+    type: 'CERTIFICATE_ADDITION' | 'VERIFICATION_REQUEST'; // Adicionado VERIFICATION_REQUEST
     payload: {
-        certificate_name: string;
+        certificate_name?: string;
+        verification_id?: string;
+        verification_type?: string; // Nome amigável do dado solicitado
     };
     status: 'PENDING' | 'ACCEPTED' | 'REJECTED';
     created_at: string;
@@ -31,7 +34,7 @@ export class NotificationService {
      * Responde a uma notificação (Aceitar/Rejeitar).
      * @param notificationId ID da notificação.
      * @param action "ACCEPT" ou "REJECT".
-     * @param masterKey Necessária apenas para ACCEPT de certificados.
+     * @param masterKey Necessária para ACCEPT de certificados e VERIFICATION_REQUEST.
      */
     respondToNotification(notificationId: string, action: 'ACCEPT' | 'REJECT', masterKey: string | null = null): Observable<HMACPayload<any>> {
         const body: any = {
@@ -39,6 +42,7 @@ export class NotificationService {
             action: action.toUpperCase()
         };
         
+        // A chave mestra é necessária para qualquer ACCEPT
         if (action === 'ACCEPT' && masterKey) {
             body.master_key = masterKey;
         }

@@ -63,7 +63,8 @@ export class PedidosComponent implements OnInit {
     this.verificationService.getAllVerifications().subscribe({
       next: (res: any) => {
         // Mapeia cada verificação para extrair o nome correto
-        this.verifications = res.all_verifications.map((v: Verification) => {
+        // A resposta do backend vem no formato: { data: [...], hmac: "..." }
+        this.verifications = res.data.map((v: Verification) => {
           let displayName = '';
           if (v.verification_data_type) {
             if (typeof v.verification_data_type === 'string') { // Caso seja uma string, usa diretamente como nome

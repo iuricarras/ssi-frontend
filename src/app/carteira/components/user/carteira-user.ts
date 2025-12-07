@@ -1,9 +1,10 @@
+// src/app/carteira/components/user/carteira-user.ts
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
-import { CarteiraService, UserData, CarteiraData, VerificationRequestPayload } from '../../services/carteira.services';
+import { CarteiraService, UserData, CarteiraData, VerificationDataType } from '../../services/carteira.services';
 import { AuthService } from '../../../auth/services/auth.service';
 import { UserService } from '../../../home/main-page/services/user.service';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
@@ -41,7 +42,7 @@ export class CarteiraUser implements OnInit {
 
   // Modals: Pedido de Informação 
   mostrarModalConfirmacao: boolean = false;
-  itemSelecionado: any = null;
+  itemSelecionado: { chave: string; tipo: 'personalData' | 'certificate' } | null = null;
   mensagemPedido: string = '';
   chavePedido: string = ''; // Chave mestra do EC (requerente) para cifrar o segredo.
 
@@ -175,10 +176,10 @@ export class CarteiraUser implements OnInit {
       carteiraData.certificates.forEach((cert: any) => {
         const certificadoAgrupado: any = {
           tipo: 'certificate',
-          nome: cert.nome
+          chave: cert.nome
         };
 
-        if (certificadoAgrupado.nome) {
+        if (certificadoAgrupado.chave) {
           dados.push(certificadoAgrupado);
         }
       });
@@ -205,9 +206,13 @@ export class CarteiraUser implements OnInit {
    * Mostra o modal de confirmação.
    */
   abrirConfirmacaoPedido(item: any) {
-    this.itemSelecionado = item;
+    this.itemSelecionado = {
+        chave: item.chave,
+        tipo: item.tipo
+    };
     this.mensagemPedido = '';
     this.chavePedido = '';
+    this.mensagemErro = ''; // Limpar erro anterior
     this.mostrarModalConfirmacao = true;
   }
 
@@ -223,41 +228,15 @@ export class CarteiraUser implements OnInit {
     this.itemSelecionado = null;
     this.mensagemPedido = '';
     this.chavePedido = '';
+    this.mensagemErro = '';
   }
 
-  // confirmarPedido() {
-  //   if (!this.itemSelecionado) return;
-  //   if (!this.chavePedido || this.chavePedido.trim() === '') {
-  //     this.mensagemErro = 'É necessário fornecer uma chave para o pedido.';
-  //     return;
-  //   }
-
-  //   const verificationDataType = this.itemSelecionado.chave || this.itemSelecionado.nome;
-
-  //   // Payload adaptado para o endpoint /verify/request-verification
-  //   const payload: VerificationRequestPayload = { 
-  //     masterKey: this.chavePedido, 
-  //     verificationUser: this.username, 
-  //     verificationDataType: verificationDataType 
-  //   };
-
-  //   this.carteiraService.requestVerification(payload).subscribe({
-  //     next: (resp) => {
-  //       alert('Pedido de informação submetido com sucesso! O utilizador receberá uma notificação.');
-  //       this.fecharConfirmacao();
-  //     },
-  //     error: (err) => {
-  //       alert(`Erro ao enviar pedido de informação: ${err.error?.error || 'Erro desconhecido'}`);
-  //       this.fecharConfirmacao();
-  //     }
-  //   });
-  // }
 
   /**
    * confirmarPedido()
    * Confirma e envia o pedido de verificação ao servidor.
    * Valida se existe item selecionado e chave fornecida.
-   * Chama carteiraService.requestVerification() com email, item e chave.
+   * Chama carteiraService.requestVerification().
    * Verifica integridade da resposta com HMAC.
    * Fecha modal após sucesso ou erro.
    */
@@ -268,15 +247,26 @@ export class CarteiraUser implements OnInit {
       return;
     }
 
-    this.carteiraService.requestVerification(this.email, this.itemSelecionado, this.chavePedido).subscribe({
+    const verificationDataType: VerificationDataType = {
+      chave: this.itemSelecionado.chave,
+      tipo: this.itemSelecionado.tipo
+    };
+    
+    // O email é o ID do utilizador alvo
+    const recipientEmail = this.email; 
+
+    this.carteiraService.requestVerification(recipientEmail, verificationDataType, this.chavePedido).subscribe({
       next: (message) => {
         if (!verifywithHMAC(JSON.stringify(message.data), message.hmac)) {
           this.mensagemErro = 'Falha na verificação do pedido.';
+        } else {
+            alert('Pedido de informação submetido com sucesso! O utilizador receberá uma notificação.');
         }
         this.fecharConfirmacao();
       },
       error: (err) => {
-        this.mensagemErro = 'Erro ao enviar pedido de informação.';
+        this.mensagemErro = err.error?.error || 'Erro ao enviar pedido de informação.';
+        alert(this.mensagemErro);
         this.fecharConfirmacao();
       }
     });
