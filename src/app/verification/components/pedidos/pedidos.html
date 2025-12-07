@@ -22,6 +22,12 @@
     <div *ngIf="loading" class="loading-state">Carregando...</div>
     <div *ngIf="error" class="error">{{ error }}</div>
 
+    <!-- Nenhum pedido -->
+    <div *ngIf="!loading && !error && verifications.length === 0" class="empty-state">
+      <h2>Nenhum pedido efetuado</h2>
+      <p>Os pedidos efetuados aparecerão aqui.</p>
+    </div>
+
     <div *ngFor="let v of verifications" class="pedido-card">
       <div class="pedido-info">
         <h3>{{ v.verification_data_type_display }}</h3>
