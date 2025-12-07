@@ -1,59 +1,45 @@
-# BitsOfMe
+# BitsOfMe Frontend
+Este repositório implementa o frontend da aplicação denominada BitsOfMe, consistindo em uma aplicação web desenvolvida em Angular, responsável por permitir que utilizadores e entidades credenciadoras interajam com o backend e assim possam realizar autenticação, visualização e geração de carteiras digitais e que também possam aceitar ou rejeitar credenciais e partilhar informações de forma customizada.
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.4.
+## Autores
 
-## Development server
+M15432 - Ana Silva
 
-To start a local development server, run:
+A56902 - Eduardo Marciano Meneses
 
-```bash
-ng serve
-```
+M15856 - Iuri Carrasqueiro
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+E11762 - Marcos Assunção
 
-## Code scaffolding
+E11654 - Rodrigo Santos
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+## Requisitos
+* Node.js 20+
+* Angular CLI 17+
 
-```bash
-ng generate component component-name
-```
+## Instalação
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
+Clonar o repositório:
 
 ```bash
-ng build
+git clone <URL_DO_REPO>
+cd ssi-frontend
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+Instalar dependências:
 
 ```bash
-ng test
+npm install
 ```
 
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
+## Execução
 
 ```bash
-ng e2e
+ng s
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+Aplicação disponível em:
 
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+```
+http://localhost:4200
+```
