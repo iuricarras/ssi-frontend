@@ -106,3 +106,13 @@
   color: orange;
   font-weight: bold;
 }
+
+.empty-state {
+  margin-top: 20px;
+  padding: 15px;
+  text-align: center;
+  color: --black;
+  font-size: 23px;
+  opacity: 1;
+}
+
