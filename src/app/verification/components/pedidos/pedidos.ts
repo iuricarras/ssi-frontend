@@ -48,6 +48,17 @@ export class PedidosComponent implements OnInit {
     this.loadVerifications();
   }
 
+
+  /**
+   * loadVerifications()
+   * Carrega todas as verificações através do VerificationService.
+   * Faz um request à API para obter a lista de verificações.
+   * Para cada verificação recebida:
+   *   - Extrai o nome ou chave de verification_data_type.
+   *   - Cria uma propriedade adicional (verification_data_type_display) para mostrar no UI.
+   * Se a requisição for bem-sucedida, atualiza verifications termina o loading.
+   * Se ocorrer erro, define mensagem de erro e também desativa o loading.
+   */
   loadVerifications() {
     this.verificationService.getAllVerifications().subscribe({
       next: (res: any) => {
@@ -55,14 +66,15 @@ export class PedidosComponent implements OnInit {
         this.verifications = res.all_verifications.map((v: Verification) => {
           let displayName = '';
           if (v.verification_data_type) {
-            if (typeof v.verification_data_type === 'string') {
+            if (typeof v.verification_data_type === 'string') { // Caso seja uma string, usa diretamente como nome
               displayName = v.verification_data_type;
-            } else {
-              displayName = v.verification_data_type.chave || v.verification_data_type.nome || '';
+            } else {  
+              // Caso seja um objeto, tenta usar a chave ou o nome
+              displayName = v.verification_data_type.chave || v.verification_data_type.nome || ''; 
             }
           }
           return {
-            ...v,
+            ...v,  // Return do objeto original da verificação
             verification_data_type_display: displayName
           };
         });
@@ -75,6 +87,15 @@ export class PedidosComponent implements OnInit {
     });
   }
 
+
+  /**
+   * timeLeft(expires_at)
+   * Calcula o tempo restante até a expiração de uma verificação.
+   * Converte expires_at em timestamp.
+   * Calcula a diferença entre a data de expiração e o momento atual.
+   * Se já expirou, retorna "Expirado".
+   * Caso contrário, retorna uma string com horas e minutos restantes.
+   */
   timeLeft(expires_at: string): string {
     const expires = new Date(expires_at).getTime();
     const now = Date.now();
@@ -88,11 +109,25 @@ export class PedidosComponent implements OnInit {
     return `${hours}h ${minutes}m restantes`;
   }
 
+
+   /**
+   * openVerification(id, accepted)
+   * Abre uma verificação específica.
+   * Só permite navegação se accepted = true (verificação aceite).
+   * Redireciona para /verification/:id.
+   */
   openVerification(id: string, accepted: boolean) {
     if (!accepted) return;
     this.router.navigate(['/verification', id]);
   }
 
+
+  /**
+   * onLogout()
+   * Faz logout do utilizador chamando AuthService.logout().
+   * Se a operação for bem-sucedida, redireciona para /auth/home-login.
+   * Se houver um erro, mostra no terminal e redireciona para /auth/home-login.
+   */
   public onLogout(): void {
     this.authService.logout().subscribe({
       next: (): void => {
