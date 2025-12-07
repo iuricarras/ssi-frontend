@@ -38,6 +38,7 @@ export class AccreditingAgencyLogin implements OnInit {
     email: new FormControl("", [Validators.required, Validators.email])
   });
 
+  // Formulário para validar se o ficheiro de assinatura foi selecionado
   signatureForm = new FormGroup({
     signature: new FormControl("", [Validators.required])
   });
@@ -47,6 +48,13 @@ export class AccreditingAgencyLogin implements OnInit {
     private router: Router
   ) {}
 
+
+  /**
+   * ngOnInit()
+   * Método do Angular chamado ao inicializar o componente.
+   * Verifica se o utilizador já está autenticado através de authService.me().
+   * Se estiver autenticado, redireciona para /home/main-page.
+   */
   ngOnInit(): void {
     this.authService.me().subscribe({
       next: () => this.router.navigateByUrl("/home/main-page"),
@@ -54,6 +62,17 @@ export class AccreditingAgencyLogin implements OnInit {
     });
   }
 
+
+  /**
+   * startSignatureLogin()
+   * Inicia o processo de login por assinatura digital.
+   * Valida o email inserido no formulário.
+   * Chama authService.startSignature(email) para pedir um challenge ao servidor.
+   * Se resposta for válida (200 + challenge_id + nonce):
+   *   - Guarda email, challengeId e nonce.
+   *   - Mostra o nonce ao utilizador para ser assinado com a chave privada.
+   * Caso contrário, mostra mensagem de erro.
+   */
   startSignatureLogin(): void {
     const email = this.emailForm.get("email")?.value;
     this.message = null;
@@ -89,6 +108,13 @@ export class AccreditingAgencyLogin implements OnInit {
     }
   }
 
+
+  /**
+   * onSignatureFileSelected(event)
+   * Lida com a seleção do ficheiro de assinatura.
+   * Guarda o ficheiro selecionado em signatureFile.
+   * Atualiza o campo signature do formulário para indicar que o ficheiro foi carregado.
+   */
   onSignatureFileSelected(event: any): void {
     const file = event.target.files[0];
     this.signatureFile = file || null;
@@ -100,6 +126,18 @@ export class AccreditingAgencyLogin implements OnInit {
     }
   }
 
+
+  /**
+   * verifySignatureLogin()
+   * Verifica a assinatura enviada pelo utilizador.
+   * Valida se existe ficheiro de assinatura e challenge ativo.
+   * Chama authService.verifySignature(email, challengeId, signatureFile).
+   * Se a resposta for válida (200 + body.ok = true):
+   *   - Cria código HMAC com email + session_nonce.
+   *   - Guarda no localStorage para manter sessão.
+   *   - Mostra mensagem de sucesso e redireciona para /home/main-page.
+   * Caso contrário, mostra uma mensagem de erro de assinatura inválida ou challenge expirado.
+   */
   verifySignatureLogin(): void {
     this.message = null;
     this.errorMessage = null;
@@ -137,6 +175,10 @@ export class AccreditingAgencyLogin implements OnInit {
     }
   }
 
+
+  /**
+   * goToRegister(): Redireciona o utilizador para a página de registo de entidade credenciadora.
+   */
   goToRegister(): void {
     this.router.navigateByUrl("register/ec-register");
   }

@@ -6,7 +6,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { CommonModule, NgIf, NgFor } from '@angular/common';
 import { AuthService } from '../../../auth/services/auth.service';
 
-// --- Tipagem ---
+// Tipagem 
 type VerificationDataType = { chave?: string; nome?: string } | string;
 
 interface Verification {
@@ -51,7 +51,7 @@ export class PedidosComponent implements OnInit {
 
   /**
    * loadVerifications()
-   * Carrega todas as verificações através do VerificationService.
+   * Carrega todas as verificações (pedidos) através do VerificationService.
    * Faz um request à API para obter a lista de verificações.
    * Para cada verificação recebida:
    *   - Extrai o nome ou chave de verification_data_type.

@@ -18,8 +18,8 @@ export class AuthService {
 
    /**
    * requestLoginCode()
-   * Solicita à API o envio de um código OTP para o e-mail informado.
-   * Faz uma requisição POST para /start com o e-mail do utilizador.
+   * Solicita à API o envio de um código OTP para o email informado.
+   * Faz uma requisição POST para /start com o email do utilizador.
    * Retorna um Observable com a resposta HTTP, incluindo status e body.
    */
   public requestLoginCode(email: string): Observable<HttpResponse<any>> {
@@ -86,7 +86,7 @@ export class AuthService {
   /**
    * verifySignature()
    * Verifica a assinatura digital enviada pelo utilizador.
-   * Converte o ficheiro em Base64 e envia via POST para /signature/verify.
+   * Converte o ficheiro para Base64 e envia via POST para /signature/verify.
    * Se a assinatura for válida, a API confirma a autenticação.
    * Retorna um Observable com a resposta HTTP.
    */
@@ -107,7 +107,7 @@ export class AuthService {
    * fileToBase64()
    * Converte um ficheiro em string Base64 para envio à API.
    * Utiliza FileReader para ler o conteúdo do ficheiro.
-   * Retorna uma Promise com o conteúdo em Base64.
+   * Retorna o conteúdo em Base64.
    */
   private fileToBase64(file: File): Promise<string> {
     return new Promise((resolve, reject) => {

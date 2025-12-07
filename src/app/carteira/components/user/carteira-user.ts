@@ -25,7 +25,7 @@ import { verifywithHMAC } from '../../../utils/hmac';
   styleUrls: ['./carteira-user.css']
 })
 export class CarteiraUser implements OnInit {
-  // --- Variáveis de Estado ---
+  // Variáveis de Estado 
   mensagemErro: string = '';
 
   // Dados do Utilizador (Perfil Visualizado)
@@ -39,13 +39,13 @@ export class CarteiraUser implements OnInit {
   dadosAcessiveis: boolean = false;
   certificadora: boolean = false;
 
-  // --- Modals: Pedido de Informação ---
+  // Modals: Pedido de Informação 
   mostrarModalConfirmacao: boolean = false;
   itemSelecionado: any = null;
   mensagemPedido: string = '';
   chavePedido: string = ''; // Chave mestra do EC (requerente) para cifrar o segredo.
 
-  // --- Modals: Envio de Certificado ---
+  // Modals: Envio de Certificado 
   mostrarModalEnviarCertificado: boolean = false;
   certForm: any = {
     nome: '',
@@ -58,7 +58,7 @@ export class CarteiraUser implements OnInit {
   signatureContent: string | null = null;
   lastGeneratedJson: string | null = null;
 
-  // --- Pesquisa ---
+  // Pesquisa 
   searchControl = new FormControl('');
   searchResults: any[] = [];
 
@@ -91,9 +91,6 @@ export class CarteiraUser implements OnInit {
     });
   }
 
-  // ==================================================================================
-  // 1. Carregamento de Dados (Perfil e Carteira)
-  // ==================================================================================
 
   /**
    * Carrega os dados públicos do utilizador (nome, email) e os itens da sua carteira.
@@ -198,10 +195,15 @@ export class CarteiraUser implements OnInit {
     return this.dadosCarteira.filter(dado => dado.tipo === 'certificate');
   }
 
-  // ==================================================================================
-  // 2. Pedido de Informação (Requisição de Verificação)
-  // ==================================================================================
 
+
+  /**
+   * abrirConfirmacaoPedido(item)
+   * Abre o modal de confirmação para enviar um pedido de verificação.
+   * Guarda o item selecionado.
+   * Limpa mensagens e chave de pedido.
+   * Mostra o modal de confirmação.
+   */
   abrirConfirmacaoPedido(item: any) {
     this.itemSelecionado = item;
     this.mensagemPedido = '';
@@ -209,6 +211,13 @@ export class CarteiraUser implements OnInit {
     this.mostrarModalConfirmacao = true;
   }
 
+
+  /**
+   * fecharConfirmacao()
+   * Fecha o modal de confirmação de pedido.
+   * Limpa estado interno (item selecionado, mensagens, chave).
+   * Oculta o modal.
+   */
   fecharConfirmacao() {
     this.mostrarModalConfirmacao = false;
     this.itemSelecionado = null;
@@ -244,6 +253,14 @@ export class CarteiraUser implements OnInit {
   //   });
   // }
 
+  /**
+   * confirmarPedido()
+   * Confirma e envia o pedido de verificação ao servidor.
+   * Valida se existe item selecionado e chave fornecida.
+   * Chama carteiraService.requestVerification() com email, item e chave.
+   * Verifica integridade da resposta com HMAC.
+   * Fecha modal após sucesso ou erro.
+   */
   confirmarPedido() {
     if (!this.itemSelecionado) return;
     if (!this.chavePedido || this.chavePedido.trim() === '') {
@@ -265,21 +282,29 @@ export class CarteiraUser implements OnInit {
     });
   }
 
-  // ==================================================================================
-  // 3. Envio de Certificado (Requisição de Adição de Certificado)
-  // ==================================================================================
 
+  /**
+   * abrirModalEnviar()
+   * Abre o modal para envio de certificado.
+   * Inicializa certForm com dados básicos (nome, entidade, emissão).
+   */
   abrirModalEnviar() {
     this.mostrarModalEnviarCertificado = true;
     this.certForm = { nome: '', entidade: this.emissorNome, emissao: this.dataEmissao, campos: [{ chave: '', valor: '' }] };
   }
 
+  /**
+   * fecharModalEnviar()
+   * Fecha o modal de envio de certificado.
+   * Limpa certForm e assinatura.
+   */
   fecharModalEnviar() {
     this.mostrarModalEnviarCertificado = false;
     this.certForm = { nome: '', entidade: '', emissao: '', campos: [] };
     this.signatureContent = null;
   }
 
+  // Adiciona novo campo ao formulário de certificado.
   adicionarCampo() {
     if (!this.certForm.campos) this.certForm.campos = [];
     this.certForm.campos.push({ chave: '', valor: '' });
@@ -291,6 +316,7 @@ export class CarteiraUser implements OnInit {
   }
 
   /**
+   * prepararPayload()
    * Constrói o payload JSON para assinatura e download.
    * NOTE: O backend espera os dados do certificado no formato de mapa (chave: valor).
    */
@@ -311,8 +337,12 @@ export class CarteiraUser implements OnInit {
     return certificateData;
   }
 
+  
   /**
-   * Gera o ficheiro JSON para o utilizador descarregar e assinar localmente.
+   * gerarJson()
+   * Gera um ficheiro JSON para download e assinatura local.
+   * Constrói um payload com prepararPayload().
+   * Cria blob e dispara download automático.
    */
   gerarJson() {
     const payload = this.prepararPayload();
@@ -333,8 +363,10 @@ export class CarteiraUser implements OnInit {
   }
 
   /**
-   * Processa o ficheiro de assinatura selecionado pelo utilizador.
-   * Lê o ficheiro como ArrayBuffer e converte para Base64.
+   * onSignatureSelected(event)
+   * Processa o ficheiro de assinatura selecionado.
+   * Converte para Base64.
+   * Guarda em signatureContent.
    */
   onSignatureSelected(event: any) {
     const file = event?.target?.files && event.target.files[0];
@@ -356,7 +388,12 @@ export class CarteiraUser implements OnInit {
   }
 
   /**
-   * Envia o certificado (JSON) e a assinatura para o servidor.
+   * enviarCertificadoComAssinatura()
+   * Envia certificado e assinatura para o servidor.
+   * Valida se a assinatura e o nome do certificado foram fornecidos.
+   * Constrói um payload com e adiciona a assinatura.
+   * Verifica integridade com HMAC.
+   * Mostra um alerta de sucesso ou erro e fecha o modal.
    */
   enviarCertificadoComAssinatura() {
     if (!this.signatureContent) {
@@ -368,14 +405,14 @@ export class CarteiraUser implements OnInit {
       return;
     }
 
-    // 1. Prepara os dados base do certificado
+    // Prepara os dados base do certificado
     const certificateData = this.prepararPayload();
 
-    // 2. Adiciona a assinatura da EC ao objeto de dados do certificado, pois o backend
-    // espera a assinatura DENTRO de `certificate_data` para verificação.
+    // Adiciona a assinatura da EC ao objeto de dados do certificado, pois o backend
+    // espera a assinatura DENTRO de certificate_data para verificação.
     certificateData.signature = this.signatureContent;
 
-    // 3. Usa o novo método do serviço que aponta para /notifications/request-certificate
+    // Usa o novo método do serviço que aponta para /notifications/request-certificate
     this.carteiraService.sendCertificateAddition(
       this.email, // O email do utilizador alvo
       certificateData
@@ -399,10 +436,12 @@ export class CarteiraUser implements OnInit {
     });
   }
 
-  // ==================================================================================
-  // 4. Helpers e Navegação
-  // ==================================================================================
 
+
+  /**
+   * getTodayIsoDate()
+   * Retorna a data atual em formato dd-mm-yyyy.
+   */
   getTodayIsoDate(): string {
     const d = new Date();
     const yyyy = d.getFullYear();
@@ -411,6 +450,12 @@ export class CarteiraUser implements OnInit {
     return `${dd}-${mm}-${yyyy}`;
   }
 
+
+  /**
+   * onLogout()
+   * Faz logout do utilizador.
+   * Redireciona para /auth/home-login.
+   */
   public onLogout(): void {
     this.authService.logout().subscribe({
       next: (): void => {
