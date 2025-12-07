@@ -3,7 +3,7 @@ import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
-import { CarteiraService, UserData, CarteiraData, VerificationRequestPayload } from '../../services/carteira.services'; 
+import { CarteiraService, UserData, CarteiraData, VerificationRequestPayload } from '../../services/carteira.services';
 import { AuthService } from '../../../auth/services/auth.service';
 import { UserService } from '../../../home/main-page/services/user.service';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
@@ -27,7 +27,7 @@ import { verifywithHMAC } from '../../../utils/hmac';
 export class CarteiraUser implements OnInit {
   // --- Variáveis de Estado ---
   mensagemErro: string = '';
-  
+
   // Dados do Utilizador (Perfil Visualizado)
   nome: string = '';
   username: string = '';
@@ -36,7 +36,7 @@ export class CarteiraUser implements OnInit {
   dadosCarteira: any[] = [];
 
   // Permissões e Flags
-  dadosAcessiveis: boolean = false; 
+  dadosAcessiveis: boolean = false;
   certificadora: boolean = false;
 
   // --- Modals: Pedido de Informação ---
@@ -68,7 +68,7 @@ export class CarteiraUser implements OnInit {
     private route: ActivatedRoute,
     private userService: UserService,
     private authService: AuthService
-  ) {}
+  ) { }
 
 
   ngOnInit() {
@@ -189,7 +189,7 @@ export class CarteiraUser implements OnInit {
 
     return dados;
   }
-  
+
   getDadosPessoais(): any[] {
     return this.dadosCarteira.filter(dado => dado.tipo === 'personalData');
   }
@@ -224,14 +224,14 @@ export class CarteiraUser implements OnInit {
   //   }
 
   //   const verificationDataType = this.itemSelecionado.chave || this.itemSelecionado.nome;
-    
+
   //   // Payload adaptado para o endpoint /verify/request-verification
   //   const payload: VerificationRequestPayload = { 
   //     masterKey: this.chavePedido, 
   //     verificationUser: this.username, 
   //     verificationDataType: verificationDataType 
   //   };
-    
+
   //   this.carteiraService.requestVerification(payload).subscribe({
   //     next: (resp) => {
   //       alert('Pedido de informação submetido com sucesso! O utilizador receberá uma notificação.');
@@ -250,9 +250,12 @@ export class CarteiraUser implements OnInit {
       this.mensagemErro = 'É necessário fornecer uma chave para o pedido.';
       return;
     }
-    
+
     this.carteiraService.requestVerification(this.email, this.itemSelecionado, this.chavePedido).subscribe({
-      next: (resp) => {
+      next: (message) => {
+        if (!verifywithHMAC(JSON.stringify(message.data), message.hmac)) {
+          this.mensagemErro = 'Falha na verificação do pedido.';
+        }
         this.fecharConfirmacao();
       },
       error: (err) => {
@@ -301,7 +304,7 @@ export class CarteiraUser implements OnInit {
     (this.certForm.campos || []).forEach((c: any) => {
       if (c && c.chave && c.chave.toString().trim() !== '') {
         // Assume que a chave do campo será a chave no objeto final
-        certificateData[c.chave] = c.valor; 
+        certificateData[c.chave] = c.valor;
       }
     });
 
@@ -314,7 +317,7 @@ export class CarteiraUser implements OnInit {
   gerarJson() {
     const payload = this.prepararPayload();
     // Para download e assinatura, queremos o JSON completo com todos os campos
-    const jsonStr = JSON.stringify(payload, null, 2); 
+    const jsonStr = JSON.stringify(payload, null, 2);
     this.lastGeneratedJson = jsonStr;
 
     // Trigger download
@@ -361,24 +364,30 @@ export class CarteiraUser implements OnInit {
       return;
     }
     if (!this.certForm.nome.trim()) {
-        alert('O nome do certificado é obrigatório.');
-        return;
+      alert('O nome do certificado é obrigatório.');
+      return;
     }
-    
+
     // 1. Prepara os dados base do certificado
     const certificateData = this.prepararPayload();
-    
+
     // 2. Adiciona a assinatura da EC ao objeto de dados do certificado, pois o backend
     // espera a assinatura DENTRO de `certificate_data` para verificação.
-    certificateData.signature = this.signatureContent; 
-    
+    certificateData.signature = this.signatureContent;
+
     // 3. Usa o novo método do serviço que aponta para /notifications/request-certificate
     this.carteiraService.sendCertificateAddition(
       this.email, // O email do utilizador alvo
       certificateData
     ).subscribe({
-      next: (resp) => {
-        alert('Requisição de Certificado submetida com sucesso! O utilizador será notificado.');
+      next: (message) => {
+        if (!verifywithHMAC(JSON.stringify(message.data), message.hmac)) {
+          this.mensagemErro = 'Falha na verificação do pedido.';
+          this.fecharModalEnviar();
+          this.signatureContent = null;
+          return;
+        }
+         alert('Requisição de Certificado submetida com sucesso! O utilizador será notificado.');
         this.fecharModalEnviar();
         this.signatureContent = null;
       },

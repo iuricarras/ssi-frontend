@@ -5,7 +5,7 @@ import { Router, RouterModule } from '@angular/router';
 import { NotificationService, Notification } from '../../services/notification.service';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../auth/services/auth.service'; // Para o logout
-
+import { verifywithHMAC } from '../../../utils/hmac';
 @Component({
   selector: 'app-notification',
   standalone: true,
@@ -48,9 +48,16 @@ export class NotificationComponent implements OnInit {
     this.successMessage = null;
 
     this.notificationService.getPendingNotifications().subscribe({
-      next: (res: Notification[] | any) => {
+      next: (message) => {
+        var data = message.data;
+        var hmac = message.hmac;
+        if (!verifywithHMAC(JSON.stringify(data), hmac)) {
+          this.errorMessage = "Falha na verificação de integridade dos dados.";
+          this.isLoading = false;
+          return;
+        }
         // O backend retorna um objeto com a chave 'notifications'
-        this.notifications = res.notifications || [];
+        this.notifications = data || [];
         this.isLoading = false;
       },
       error: (err) => {
@@ -92,8 +99,15 @@ export class NotificationComponent implements OnInit {
     const key = this.selectedNotification.type === 'CERTIFICATE_ADDITION' ? this.masterKey : null;
     
     this.notificationService.respondToNotification(this.selectedNotification.notification_id, 'ACCEPT', key).subscribe({
-      next: (resp) => {
-        this.successMessage = resp.body?.message || "Requisição aceite com sucesso.";
+      next: (message) => {
+        var data = message.data;
+        var hmac = message.hmac;
+        if (!verifywithHMAC(JSON.stringify(data), hmac)) {
+          this.modalErrorMessage = "Falha na verificação de integridade dos dados.";
+          this.isLoading = false;
+          return;
+        }
+        this.successMessage = data.message || "Requisição aceite com sucesso.";
         this.closeModal();
         this.loadNotifications(); 
       },
@@ -110,8 +124,15 @@ export class NotificationComponent implements OnInit {
     this.successMessage = null;
     
     this.notificationService.respondToNotification(notification.notification_id, 'REJECT').subscribe({
-      next: (resp) => {
-        this.successMessage = resp.body?.message || "Requisição rejeitada com sucesso.";
+      next: (message) => {
+        var data = message.data;
+        var hmac = message.hmac;
+        if (!verifywithHMAC(JSON.stringify(data), hmac)) {
+          this.errorMessage = "Falha na verificação de integridade dos dados.";
+          this.isLoading = false;
+          return;
+        }
+        this.successMessage = data.message || "Requisição rejeitada com sucesso.";
         this.loadNotifications();
       },
       error: (err) => {

@@ -17,9 +17,12 @@ function signwithHMAC(payload: object): string {
 
 function verifywithHMAC(payload: string, token: string): boolean {
     try {
+        console.log('Verifying payload with HMAC:', payload, token);
+        
         var secret = localStorage.getItem('hmacCode')
         var hashSecret = Crypto.SHA256(secret || '').toString(Crypto.enc.Hex);
         var decoded = Crypto.HmacSHA256(payload, hashSecret || '').toString(Crypto.enc.Hex);
+        console.log('Decoded HMAC:', decoded);
         return decoded === token;
     } catch (err) {
         throw new Error('Invalid token');

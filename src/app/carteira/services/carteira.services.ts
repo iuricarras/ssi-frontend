@@ -1,8 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpResponse, HttpHeaders } from "@angular/common/http";
 import { Observable } from 'rxjs';
-import {HMACPayload} from '../../utils/hmac';
-import { signwithHMAC } from '../../utils/hmac';
+import {HMACPayload, signwithHMAC} from '../../utils/hmac';
 export interface UserData {
   id: string;
   nome: string;
@@ -68,10 +67,10 @@ export class CarteiraService {
   // }
 
  
-  requestVerification(verificationUser: string, verificationDataType: any, masterKey: string): Observable<HttpResponse<any>> {
-    return this.http.post<any>(`${this.API}/verify/request-verification`,
-      { verificationUser, verificationDataType, masterKey },
-      { observe: 'response', withCredentials: true }
+  requestVerification(verificationUser: string, verificationDataType: any, masterKey: string): Observable<HMACPayload<any>> {
+    return this.http.post<HMACPayload<any>>(`${this.API}/verify/request-verification`,
+      { data: {verificationUser, verificationDataType, masterKey} , hmac: signwithHMAC(JSON.parse(JSON.stringify({verificationUser, verificationDataType, masterKey}))) },
+      { withCredentials: true }
     );
   }
 
@@ -80,16 +79,16 @@ export class CarteiraService {
    * Endpoint do backend: /notifications/request-certificate
    * NOTE: A assinatura digital da EC deve estar DENTRO do certificateData.
    */
-  sendCertificateAddition(recipientEmail: string, certificateData: any): Observable<HttpResponse<any>> {
+  sendCertificateAddition(recipientEmail: string, certificateData: any): Observable<HMACPayload<any>> {
     // O backend de notificação espera { recipient_email, certificate_data }
-    const payload = {
+    const data = {
       recipient_email: recipientEmail,
       certificate_data: certificateData
     };
     
-    return this.http.post<any>(`${this.API}/notifications/request-certificate`,
-      payload,
-      { observe: 'response', withCredentials: true }
+    return this.http.post<HMACPayload<any>>(`${this.API}/notifications/request-certificate`,
+      {data: data , hmac: signwithHMAC(JSON.parse(JSON.stringify(data))) },
+      { withCredentials: true }
     );
   }
   

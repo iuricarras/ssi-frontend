@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpResponse } from "@angular/common/http";
 import { Observable } from 'rxjs';
+import { HMACPayload , signwithHMAC} from '../../utils/hmac';
 
 export interface Notification {
     notification_id: string;
@@ -22,8 +23,8 @@ export class NotificationService {
 
     constructor(private http: HttpClient) {}
 
-    getPendingNotifications(): Observable<Notification[]> {
-        return this.http.get<Notification[]>(`${this.API}/notifications/pending`, { withCredentials: true });
+    getPendingNotifications(): Observable<HMACPayload<any>> {
+        return this.http.get<HMACPayload<any>>(`${this.API}/notifications/pending`, { withCredentials: true });
     }
 
     /**
@@ -32,7 +33,7 @@ export class NotificationService {
      * @param action "ACCEPT" ou "REJECT".
      * @param masterKey Necessária apenas para ACCEPT de certificados.
      */
-    respondToNotification(notificationId: string, action: 'ACCEPT' | 'REJECT', masterKey: string | null = null): Observable<HttpResponse<any>> {
+    respondToNotification(notificationId: string, action: 'ACCEPT' | 'REJECT', masterKey: string | null = null): Observable<HMACPayload<any>> {
         const body: any = {
             notification_id: notificationId,
             action: action.toUpperCase()
@@ -42,6 +43,6 @@ export class NotificationService {
             body.master_key = masterKey;
         }
 
-        return this.http.post<any>(`${this.API}/notifications/respond`, body, { observe: "response", withCredentials: true });
+        return this.http.post<HMACPayload<any>>(`${this.API}/notifications/respond`, {data: body, hmac: signwithHMAC(body)}, { withCredentials: true });
     }
 }
