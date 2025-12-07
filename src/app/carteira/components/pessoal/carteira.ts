@@ -69,7 +69,13 @@ export class Carteira implements OnInit {
 
   // --- Carregamento de Dados ---
 
-  /** Carrega as informações básicas do perfil do utilizador. */
+  /**
+   * carregarDadosUtilizador()
+   * Obtém dados básicos do perfil do utilizador (nome, username, email).
+   * Chama carteiraService.getUserData().
+   * Verifica integridade com HMAC.
+   * Atualiza propriedades locais se válido.
+   */
   carregarDadosUtilizador() {
     this.carteiraService.getUserData().subscribe({
       next: (message) => {
@@ -89,7 +95,14 @@ export class Carteira implements OnInit {
     });
   } 
 
-  /** Valida a chave mestra inserida e carrega os dados decifrados da carteira. */
+   /**
+   * validarChaveMestra()
+   * Valida a chave mestra inserida e carrega dados da carteira.
+   * Se chave estiver vazia, mostra erro.
+   * Chama carteiraService.getCarteiraData().
+   * Verifica integridade com HMAC.
+   * Se válido, marca os dados como acessíveis.
+   */
   validarChaveMestra() {
     this.mensagemErro = '';
     
@@ -114,7 +127,14 @@ export class Carteira implements OnInit {
     });
   }
 
-  /** Transforma a estrutura de dados recebida do backend numa lista. */
+
+  /**
+   * processarDadosCarteira(carteiraData)
+   * Transforma a estrutura de dados recebidos do backend numa lista organizada.
+   * Processa dados pessoais (personalData).
+   * Processa certificados (certificates).
+   * Retorna uma lista pronta para ser usada no template.
+   */
   private processarDadosCarteira(carteiraData: any): any[] {
     const dados: any[] = [];
 
@@ -173,12 +193,17 @@ export class Carteira implements OnInit {
 
   // --- Gestão de Operações ---
 
-  /** Agenda uma operação sensível para ser executada após confirmação da chave mestra. */
+
+  /**
+   * scheduleOperation(operation)
+   * Agenda uma operação sensível (editar, eliminar, adicionar) para ser executada apenas após confirmação da chave mestra.
+   */
   private scheduleOperation(operation: () => void) {
     this.operacaoPendente = operation;
     this.mostrarModalChaveMestra = true;
   }
 
+  // Abre modal para adicionar um novo dado
   adicionarInformacao() {
     this.modoEdicao = false;
     this.dadoEdicao = { chave: '', valor: '' };
@@ -187,6 +212,7 @@ export class Carteira implements OnInit {
     this.mostrarModal = true;
   }
 
+  // Abre modal para editar um dado existente
   editarDadoPessoal(dado: any) {
     this.modoEdicao = true;
     this.dadoEdicao = { ...dado };
@@ -195,7 +221,14 @@ export class Carteira implements OnInit {
     this.mostrarModal = true;
   }
 
-  /** Prepara os dados editados/novos e agenda o envio para o servidor. */
+
+  /**
+   * salvarEdicao()
+   * Prepara dados editados ou novos e agenda o envio para o servidor.
+   * Se estiver em modo edição, atualiza um campo existente.
+   * Se estiver em modo adição, adiciona um novo campo.
+   * Agenda operação com chave mestra.
+   */
   salvarEdicao() {
     if (!this.novoNome.trim() || !this.novoValor.trim()) return;
 
@@ -266,6 +299,14 @@ export class Carteira implements OnInit {
 
   // --- Comunicação com Servidor ---
 
+
+  /**
+   * enviarAtualizacaoParaServidor(dados, masterKey)
+   * Envia dados atualizados da carteira para o servidor.
+   * Chama carteiraService.updateCarteiraData().
+   * Verifica a integridade com HMAC.
+   * Atualiza a lista local se válido.
+   */
   enviarAtualizacaoParaServidor(dados: any[], masterKey: string) {
     this.carteiraService.updateCarteiraData(dados, masterKey).subscribe({
       next: (message) => {
@@ -283,6 +324,12 @@ export class Carteira implements OnInit {
 
   // --- Autenticação ---
 
+
+  /**
+   * onLogout()
+   * Faz logout do utilizador.
+   * Redireciona para /auth/home-login.
+   */
   public onLogout(): void {
     this.authService.logout().subscribe({
       next: (): void => {
@@ -295,7 +342,7 @@ export class Carteira implements OnInit {
     });
   }
 
-
+  // Pesquisa utilizadores pelo username
   onSearch(query: string) {
     if (!query.trim()) {
       this.searchResults = [];
@@ -307,6 +354,7 @@ export class Carteira implements OnInit {
     });
   }
 
+  // Redireciona para a carteira pública de outro utilizador
   goToUserWallet(username: string) {
     this.router.navigate(['/carteira/public', username]);
   }

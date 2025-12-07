@@ -48,9 +48,9 @@ export class UserLogin implements OnInit {
     code: new FormControl("", [Validators.required, Validators.pattern(/^\d{6}$/)])
   });
 
-  /* Parâmetros (Construtor):
-  * - authService: serviço de autenticação que comunica com a API.
-  * - router: serviço Angular para navegação entre páginas.
+  /* Parâmetros do construtor:
+  * authService: serviço de autenticação que comunica com a API.
+  * router: serviço Angular para navegação entre páginas.
   */
   constructor(
     private authService: AuthService,
@@ -81,8 +81,8 @@ export class UserLogin implements OnInit {
    *   -Guarda currentEmail e challengeId.
    *   -Exibe o campo de código (isCodeVisible = true).
    *   -Mostra mensagem de sucesso.
-   * Caso contrário, mostra mensagem de erro.
-   * Em caso de exceção, mostra erro inesperado.
+   * Caso contrário, mostra uma mensagem de erro.
+   * Em caso de exceção, mostra um erro.
    */
   sendEmail(): void {
     this.enviando = true;
@@ -129,7 +129,7 @@ export class UserLogin implements OnInit {
    *   - Cria hmacCode com email.session_nonce.
    *   - Armazena no localStorage.
    *   - Mostra mensagem de sucesso.
-   *   - Redireciona para /home/main-page após 1 segundo.
+   *   - Redireciona para /home/main-page.
    * Caso contrário, mostra mensagem de erro.
    * Em caso de exceção, mostra erro inesperado.
    */

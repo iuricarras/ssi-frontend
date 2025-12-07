@@ -40,6 +40,7 @@ export interface ECRegistrationData {
 })
 
 export class ECRegister implements OnInit {
+  //Estrutura que guarda os dados de registo da entidade credenciadora
   ecData: ECRegistrationData = {
       name: '',
       tipo: '',
@@ -60,6 +61,15 @@ export class ECRegister implements OnInit {
 
   ngOnInit(): void {}
 
+
+  /**
+   * handleFileUpload(event, keyName)
+   * Processa o upload de ficheiros .pem para autenticação e certificado.
+   * Valida a extensão do ficheiro (deve ser .pem).
+   * Lê o conteúdo do ficheiro e remove quebras de linha.
+   * Guarda o conteúdo em ecData.certificate ou ecData.authenticationKey.
+   * Se a extensão for inválida, mostra alerta.
+   */
   handleFileUpload(event: Event, keyName: keyof ECRegistrationData): void {
     const input = event.target as HTMLInputElement;
 
@@ -94,6 +104,15 @@ export class ECRegister implements OnInit {
     }
   }
 
+
+  /**
+   * onSubmit(form)
+   * Submete o formulário de registo da EC.
+   * Valida se as chaves foram carregadas.
+   * Se o formulário for válido, chama registerService.registerEC().
+   * Se obtiver sucesso, mostra alerta e redireciona para login.
+   * Se não, mostra alerta de erro.
+   */
   onSubmit(form: NgForm) {
     if (this.ecData.authenticationKey == '' || this.ecData.certificate == ''){
       alert('Erro: Por favor, verifique se as Chaves foram carregadas corretamente.');
@@ -123,6 +142,10 @@ export class ECRegister implements OnInit {
     }
   }
 
+
+  /**
+   * goToLogin(): Redireciona para a página de login da Entidade Credenciadora.
+   */
   goToLogin() {
     this.router.navigateByUrl("/auth/accrediting-agency-login");
   }
