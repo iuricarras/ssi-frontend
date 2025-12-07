@@ -79,19 +79,17 @@ export class NotificationComponent implements OnInit {
   handleAccept(): void {
     if (!this.selectedNotification) return;
 
-    // A chave mestra é obrigatória para aceitar adição de certificados
-    if (this.selectedNotification.type === 'CERTIFICATE_ADDITION' && !this.masterKey.trim()) {
-      this.modalErrorMessage = "A Chave Mestra é obrigatória para adicionar um certificado.";
+    // A chave mestra do UTILIZADOR é OBRIGATÓRIA para aceitar QUALQUER tipo de requisição
+    // que envolva escrita (certificado) ou decifração/re-cifração (verificação).
+    if (!this.masterKey.trim()) {
+      this.modalErrorMessage = "A sua Chave Mestra é obrigatória para processar esta requisição.";
       return;
     }
 
     this.modalErrorMessage = null;
     this.isLoading = true;
 
-    // Master Key pode ser null se o tipo de notificação não for CERTIFICATE_ADDITION
-    const key = this.selectedNotification.type === 'CERTIFICATE_ADDITION' ? this.masterKey : null;
-    
-    this.notificationService.respondToNotification(this.selectedNotification.notification_id, 'ACCEPT', key).subscribe({
+    this.notificationService.respondToNotification(this.selectedNotification.notification_id, 'ACCEPT', this.masterKey).subscribe({
       next: (resp) => {
         this.successMessage = resp.body?.message || "Requisição aceite com sucesso.";
         this.closeModal();
@@ -140,7 +138,9 @@ export class NotificationComponent implements OnInit {
     if (notification.type === 'CERTIFICATE_ADDITION') {
       return `Novo Certificado: ${notification.payload.certificate_name}`;
     }
-    // Adicionar outros títulos conforme os tipos de notificação...
+    if (notification.type === 'VERIFICATION_REQUEST') {
+      return `Pedido de Verificação: ${notification.payload.certificate_name || notification.payload.data_type_name}`;
+    }
     return 'Nova Requisição Pendente';
   }
 }

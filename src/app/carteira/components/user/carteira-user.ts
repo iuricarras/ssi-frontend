@@ -214,35 +214,8 @@ export class CarteiraUser implements OnInit {
     this.itemSelecionado = null;
     this.mensagemPedido = '';
     this.chavePedido = '';
+    this.mensagemErro = ''; // Limpa a mensagem de erro ao fechar
   }
-
-  // confirmarPedido() {
-  //   if (!this.itemSelecionado) return;
-  //   if (!this.chavePedido || this.chavePedido.trim() === '') {
-  //     this.mensagemErro = 'É necessário fornecer uma chave para o pedido.';
-  //     return;
-  //   }
-
-  //   const verificationDataType = this.itemSelecionado.chave || this.itemSelecionado.nome;
-    
-  //   // Payload adaptado para o endpoint /verify/request-verification
-  //   const payload: VerificationRequestPayload = { 
-  //     masterKey: this.chavePedido, 
-  //     verificationUser: this.username, 
-  //     verificationDataType: verificationDataType 
-  //   };
-    
-  //   this.carteiraService.requestVerification(payload).subscribe({
-  //     next: (resp) => {
-  //       alert('Pedido de informação submetido com sucesso! O utilizador receberá uma notificação.');
-  //       this.fecharConfirmacao();
-  //     },
-  //     error: (err) => {
-  //       alert(`Erro ao enviar pedido de informação: ${err.error?.error || 'Erro desconhecido'}`);
-  //       this.fecharConfirmacao();
-  //     }
-  //   });
-  // }
 
   confirmarPedido() {
     if (!this.itemSelecionado) return;
@@ -251,12 +224,16 @@ export class CarteiraUser implements OnInit {
       return;
     }
     
+    // O EC está a enviar a sua chave mestra (chavePedido) e o email do utilizador (this.email)
+    // e o objeto de dados (this.itemSelecionado: {chave: 'nome_campo'} ou {nome: 'nome_cert'})
     this.carteiraService.requestVerification(this.email, this.itemSelecionado, this.chavePedido).subscribe({
       next: (resp) => {
+        alert('Pedido de informação submetido com sucesso! O utilizador receberá uma notificação.');
         this.fecharConfirmacao();
       },
       error: (err) => {
-        this.mensagemErro = 'Erro ao enviar pedido de informação.';
+        this.mensagemErro = err.error?.error || 'Erro ao enviar pedido de informação.';
+        alert(this.mensagemErro);
         this.fecharConfirmacao();
       }
     });
