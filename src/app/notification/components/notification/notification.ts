@@ -96,7 +96,7 @@ export class NotificationComponent implements OnInit {
     this.isLoading = true;
 
     // Master Key pode ser null se o tipo de notificação não for CERTIFICATE_ADDITION
-    const key = this.selectedNotification.type === 'CERTIFICATE_ADDITION' ? this.masterKey : null;
+    const key = this.masterKey;
     
     this.notificationService.respondToNotification(this.selectedNotification.notification_id, 'ACCEPT', key).subscribe({
       next: (message) => {
