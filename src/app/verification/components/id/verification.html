@@ -18,12 +18,26 @@
     <p><strong>Utilizador verificado:</strong> {{ verificationData.verification_user_id }}</p>
     <p><strong>Aceite em:</strong> {{ verificationData.accepted_at | date:'short' }}</p>
 
-    <h3>Campos solicitados:</h3>
-    <ul>
-      <li *ngFor="let campo of verificationData.verification_data">
-        <strong>{{ campo.chave || campo.name }}:</strong> {{ campo.valor }}
-      </li>
-    </ul>
+    <h3>Informação solicitada:</h3>
+
+      <div *ngFor="let dado of getDadosPessoais()" class="item-dado">
+        <div class="dado-header">
+          <div class="dado-info">
+            <strong>{{ dado.chave }}: </strong> {{ dado.valor }}
+          </div>
+        </div>
+      </div>
+
+     <div *ngFor="let certificado of getCertificados()" class="item-dado">
+        <div class="dado-header">
+          <div class="dado-info">
+            <h3>{{ certificado.nome }}</h3>
+            <div *ngFor="let campo of certificado.campos" class="campo-certificado">
+              <strong>{{ campo.chave }}:</strong> {{ campo.valor }}
+            </div>
+          </div>
+        </div>
+      </div>
   </div>
 
 </div>

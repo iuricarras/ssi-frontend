@@ -25,6 +25,7 @@ export class VerificationComponent implements OnInit {
   masterKey: string = '';
   error = '';
   verificationData: any = null;
+  dadosCarteira: any[] = [];
 
   constructor(
     private verificationService: VerificationService,
@@ -59,10 +60,85 @@ export class VerificationComponent implements OnInit {
     this.verificationService.getVerification(this.verificationId, this.masterKey).subscribe({
       next: (res: any) => {
         this.verificationData = res.verification;
+        console.log(this.verificationData);
+        this.dadosCarteira = this.processarDadosCarteira(this.verificationData);
+        console.log(this.dadosCarteira);
       },
       error: err => {
         this.error = err.error?.error || 'Erro ao obter verificação.';
       }
     });
   }
+
+
+  /**
+   * processarDadosCarteira()
+   * 
+   * Processa os dados da carteira de identidade. 
+   * Neste contexto é utilizador para processar os dados solicitados que vem do backend para exibição.
+   * Se o tipo for 'personalData', extrai o valor correspondente à chave especificada.
+   * Se o tipo for 'certificate', agrupa os dados em um objeto de certificado.
+   * 
+   * @param carteiraData - Os dados da carteira a serem processados.
+   * @returns Uma lista de objetos representando os dados pessoais e certificados.
+   */
+  private processarDadosCarteira(carteiraData: any): any[] {
+    const dados: any[] = [];
+
+    if (carteiraData.verification_data && carteiraData.verification_data_type) {
+      try {
+        const jsonString = carteiraData.verification_data.replace(/'/g, '"');
+        const parsedData = JSON.parse(jsonString);
+
+        const infoType = carteiraData.verification_data_type;
+
+        if (infoType.tipo === 'personalData') {
+          const key = infoType.chave;
+          const value = parsedData[key];
+          
+          if (value) {
+            dados.push({
+              tipo: 'personalData',
+              chave: key,
+              valor: value
+            });
+          }
+        } else if (infoType.tipo === 'certificate') {
+          const certificadoAgrupado: any = {
+            tipo: 'certificate',
+            nome: infoType.nome,
+            campos: []
+          };
+
+          Object.keys(parsedData).forEach(key => {
+            const value = parsedData[key];
+            if (key !== 'nome' && value && value !== null && value !== '') {
+              certificadoAgrupado.campos.push({
+                chave: key,
+                valor: value
+              });
+            }
+          });
+
+          if (certificadoAgrupado.campos.length > 0) {
+            dados.push(certificadoAgrupado);
+          }
+        }
+
+      } catch (error) {
+        console.error('Erro ao processar dados da carteira:', error);
+      }
+    }
+
+    return dados;
+  }
+
+  getDadosPessoais(): any[] {
+    return this.dadosCarteira.filter(dado => dado.tipo === 'personalData');
+  }
+
+  getCertificados(): any[] {
+    return this.dadosCarteira.filter(dado => dado.tipo === 'certificate');
+  }
+
 }
