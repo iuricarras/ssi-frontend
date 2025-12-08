@@ -4,7 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { CommonModule, NgIf, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
-
+import { VerificationService } from '../../service/verification.service';
 
 @Component({
   selector: 'app-verification',
@@ -27,6 +27,7 @@ export class VerificationComponent implements OnInit {
   verificationData: any = null;
 
   constructor(
+    private verificationService: VerificationService,
     private route: ActivatedRoute,
     private http: HttpClient
   ) {}
@@ -55,9 +56,7 @@ export class VerificationComponent implements OnInit {
 
     this.error = '';
 
-    this.http.put(`http://localhost:5000/verify/get-verifications/${this.verificationId}`, {
-      masterKey: this.masterKey
-    }).subscribe({
+    this.verificationService.getVerification(this.verificationId, this.masterKey).subscribe({
       next: (res: any) => {
         this.verificationData = res.verification;
       },
